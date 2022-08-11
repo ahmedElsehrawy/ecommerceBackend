@@ -21,6 +21,7 @@ export const user = queryField("user", {
   args: {
     where: nonNull(UserWhereUniqueInput),
   },
+  //@ts-ignore
   resolve: async (_root, args, ctx) => {
     return ctx.prisma.user.findUnique({
       where: {
@@ -35,12 +36,35 @@ export const register = mutationField("register", {
   args: {
     input: nonNull(registerInput),
   },
+  //@ts-ignore
   resolve: async (_root, args, ctx) => {
-    return ctx.prisma.user.create({
+    let createdUser = await ctx.prisma.user.create({
       data: {
         ...args.input,
         createdAt: new Date(),
         updatedAt: new Date(),
+      },
+    });
+    await ctx.prisma.cart.create({
+      data: {
+        userId: createdUser.id,
+      },
+    });
+
+    return createdUser;
+  },
+});
+
+export const deleteUser = mutationField("deleteUser", {
+  type: nonNull(User),
+  args: {
+    where: nonNull(UserWhereUniqueInput),
+  },
+  //@ts-ignore
+  resolve: async (_root, args, ctx) => {
+    return ctx.prisma.user.delete({
+      where: {
+        id: args.where.id,
       },
     });
   },

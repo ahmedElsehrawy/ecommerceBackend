@@ -1,5 +1,5 @@
-import { mutationField, nonNull, objectType } from "nexus";
-import { createCategoryInput } from "../inputs";
+import { list, mutationField, nonNull, objectType, queryField } from "nexus";
+import { createCategoryInput, getOneCategoryWhereUniqueInput } from "../inputs";
 
 export const Category = objectType({
   name: "Category",
@@ -16,12 +16,51 @@ export const createCategory = mutationField("createCategory", {
   args: {
     input: nonNull(createCategoryInput),
   },
+  //@ts-ignore
   resolve: async (_root, args, ctx) => {
     return ctx.prisma.category.create({
       data: {
         ...args.input,
         createdAt: new Date(),
         updatedAt: new Date(),
+      },
+    });
+  },
+});
+
+export const getOneCategory = queryField("getOneCategory", {
+  type: nonNull(Category),
+  args: {
+    where: nonNull(getOneCategoryWhereUniqueInput),
+  },
+  //@ts-ignore
+  resolve: async (_root, args, ctx) => {
+    return ctx.prisma.category.findUnique({
+      where: {
+        id: args.where.id,
+      },
+    });
+  },
+});
+
+export const getCategories = queryField("getCategories", {
+  type: nonNull(list(Category)),
+  //@ts-ignore
+  resolve: async (_root, _args, ctx) => {
+    return ctx.prisma.category.findMany({});
+  },
+});
+
+export const deleteCategory = mutationField("deleteCategory", {
+  type: nonNull(Category),
+  args: {
+    where: nonNull(getOneCategoryWhereUniqueInput),
+  },
+  //@ts-ignore
+  resolve: async (_root, args, ctx) => {
+    return ctx.prisma.category.delete({
+      where: {
+        id: args.where.id,
       },
     });
   },

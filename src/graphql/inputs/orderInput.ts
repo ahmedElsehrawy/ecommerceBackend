@@ -17,3 +17,10 @@ export const getOrderInput = inputObjectType({
     t.nonNull.int("id");
   },
 });
+
+export const getOrdersInput = inputObjectType({
+  name: "getOrdersInput",
+  definition(t) {
+    t.nonNull.int("userId");
+  },
+});

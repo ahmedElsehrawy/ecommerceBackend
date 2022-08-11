@@ -18,6 +18,7 @@ export const getOrderItems = queryField("getOrderItems", {
   args: {
     where: nonNull(getOrderItemsIdInput),
   },
+  //@ts-ignore
   resolve: async (_root, args, ctx) => {
     return ctx.prisma.orderItem.findMany({
       where: {
@@ -32,8 +33,10 @@ export const createOrderItem = mutationField("createOrderItem", {
   args: {
     input: nonNull(createOrderItemInput),
   },
+  //@ts-ignore
   resolve: async (_root, args, ctx) => {
     return ctx.prisma.orderItem.create({
+      //@ts-ignore
       data: {
         ...args.input,
         createdAt: new Date(),

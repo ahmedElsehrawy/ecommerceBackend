@@ -12,3 +12,17 @@ export const createAddressInput = inputObjectType({
     t.nonNull.string("houseNumber");
   },
 });
+
+export const getUserAddressesInput = inputObjectType({
+  name: "getUserAddressesInput",
+  definition(t) {
+    t.nonNull.int("userId");
+  },
+});
+
+export const getUserWhereUniqueInput = inputObjectType({
+  name: "getUserWhereUniqueInput",
+  definition(t) {
+    t.nonNull.int("id");
+  },
+});

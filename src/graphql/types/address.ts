@@ -1,5 +1,9 @@
-import { mutationField, nonNull, objectType } from "nexus";
-import { createAddressInput } from "../inputs";
+import { list, mutationField, nonNull, objectType, queryField } from "nexus";
+import {
+  createAddressInput,
+  getUserAddressesInput,
+  getUserWhereUniqueInput,
+} from "../inputs";
 
 export const Address = objectType({
   name: "Address",
@@ -20,10 +24,56 @@ export const createAddress = mutationField("createAddress", {
   args: {
     input: nonNull(createAddressInput),
   },
+  //@ts-ignore
   resolve: async (_root, args, ctx) => {
     return ctx.prisma.address.create({
       data: {
         ...args.input,
+      },
+    });
+  },
+});
+
+export const getUserAddresses = queryField("getUserAddresses", {
+  type: nonNull(list(Address)),
+  args: {
+    where: nonNull(getUserAddressesInput),
+  },
+  //@ts-ignore
+  resolve: async (_root, args, ctx) => {
+    return ctx.prisma.address.findMany({
+      where: {
+        userId: args.where.userId,
+      },
+    });
+  },
+});
+
+export const getOneAddress = queryField("getOneAddress", {
+  type: nonNull(Address),
+  args: {
+    where: nonNull(getUserWhereUniqueInput),
+  },
+  //@ts-ignore
+  resolve: async (_root, args, ctx) => {
+    return ctx.prisma.address.findUnique({
+      where: {
+        id: args.where.id,
+      },
+    });
+  },
+});
+
+export const deleteAddress = mutationField("deleteAddress", {
+  type: nonNull(Address),
+  args: {
+    where: nonNull(getUserWhereUniqueInput),
+  },
+  //@ts-ignore
+  resolve: async (_root, args, ctx) => {
+    return ctx.prisma.address.delete({
+      where: {
+        id: args.where.id,
       },
     });
   },

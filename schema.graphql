@@ -13,6 +13,20 @@ type Address {
   userId: Int!
 }
 
+type Cart {
+  id: Int!
+  items: [CartItem!]!
+  totalPrice: Float!
+  userId: Int!
+}
+
+type CartItem {
+  cartId: Int!
+  id: Int!
+  productId: Int!
+  quantity: Int!
+}
+
 type Category {
   createdAt: String!
   id: Int!
@@ -20,13 +34,30 @@ type Category {
   updatedAt: String!
 }
 
+type Discount {
+  active: Boolean!
+  createdAt: String!
+  id: Int!
+  name: String!
+  percent: Int!
+  updatedAt: String!
+}
+
 type Mutation {
+  addCartItem(input: addCartItemInput!): CartItem!
   createAddress(input: createAddressInput!): Address!
   createCategory(input: createCategoryInput!): Category!
   createOrder(input: createOrderInput!): Order!
   createOrderItem(input: createOrderItemInput!): orderItem!
   createProduct(input: createProductInput!): Product!
+  deleteAddress(where: getUserWhereUniqueInput!): Address!
+  deleteCategory(where: getOneCategoryWhereUniqueInput!): Category!
+  deleteOrder(where: getOrderInput!): Order!
+  deleteProduct(where: getProductInput!): Product!
+  deleteUser(where: UserWhereUniqueInput!): User!
   register(input: createUserInput!): User!
+  removeCartItem(where: removeCartItemWhereUniqueInput!): CartItem!
+  updateProdcut(input: updateProdcutInput!, productId: updateProdcutWhereUniqueId!): Product!
 }
 
 type Order {
@@ -59,9 +90,17 @@ type Product {
 }
 
 type Query {
-  getOrder(where: getOrderInput!): Order!
+  createDiscount(input: createDiscountInput!): Discount!
+  getCart(where: getCartWhereUniqueInput!): Cart!
+  getCategories: [Category!]!
+  getManyOrders(where: getOrdersInput!): [Order!]!
+  getOneAddress(where: getUserWhereUniqueInput!): Address!
+  getOneCategory(where: getOneCategoryWhereUniqueInput!): Category!
+  getOneOrder(where: getOrderInput!): Order!
   getOrderItems(where: getOrderItemsIdInput!): [orderItem!]!
   getProduct(where: getProductInput!): Product!
+  getProducts(where: getProductsInput!): [Product!]!
+  getUserAddresses(where: getUserAddressesInput!): [Address!]!
   user(where: UserWhereUniqueInput!): User!
 }
 
@@ -81,6 +120,12 @@ input UserWhereUniqueInput {
   id: Int!
 }
 
+input addCartItemInput {
+  cartId: Int!
+  productId: Int!
+  quantity: Int!
+}
+
 input createAddressInput {
   city: String!
   country: String!
@@ -93,6 +138,12 @@ input createAddressInput {
 
 input createCategoryInput {
   name: String!
+}
+
+input createDiscountInput {
+  active: Boolean! = false
+  name: String!
+  percent: Int!
 }
 
 input createOrderInput {
@@ -125,6 +176,14 @@ input createUserInput {
   phone: String!
 }
 
+input getCartWhereUniqueInput {
+  userId: Int!
+}
+
+input getOneCategoryWhereUniqueInput {
+  id: Int!
+}
+
 input getOrderInput {
   id: Int!
 }
@@ -133,7 +192,23 @@ input getOrderItemsIdInput {
   orderId: Int!
 }
 
+input getOrdersInput {
+  userId: Int!
+}
+
 input getProductInput {
+  id: Int!
+}
+
+input getProductsInput {
+  categoryId: Int!
+}
+
+input getUserAddressesInput {
+  userId: Int!
+}
+
+input getUserWhereUniqueInput {
   id: Int!
 }
 
@@ -144,4 +219,21 @@ type orderItem {
   productId: Int!
   quantity: Int!
   updatedAt: String!
+}
+
+input removeCartItemWhereUniqueInput {
+  id: Int!
+}
+
+input updateProdcutInput {
+  categoryId: Int
+  description: String
+  discountId: Int
+  image: String
+  name: String
+  price: Float
+}
+
+input updateProdcutWhereUniqueId {
+  id: Int!
 }

@@ -4,8 +4,9 @@ import {
   objectType,
   queryField,
   enumType,
+  list,
 } from "nexus";
-import { createOrderInput, getOrderInput } from "../inputs";
+import { createOrderInput, getOrderInput, getOrdersInput } from "../inputs";
 
 export const Order = objectType({
   name: "Order",
@@ -31,6 +32,7 @@ export const createOrder = mutationField("createOrder", {
   args: {
     input: nonNull(createOrderInput),
   },
+  //@ts-ignore
   resolve: async (_root, args, ctx) => {
     return ctx.prisma.order.create({
       data: {
@@ -42,13 +44,44 @@ export const createOrder = mutationField("createOrder", {
   },
 });
 
-export const getOrder = queryField("getOrder", {
+export const getOneOrder = queryField("getOneOrder", {
   type: nonNull(Order),
   args: {
     where: nonNull(getOrderInput),
   },
+  //@ts-ignore
   resolve: async (_root, args, ctx) => {
     return ctx.prisma.order.findUnique({
+      where: {
+        id: args.where.id,
+      },
+    });
+  },
+});
+
+export const getManyOrders = queryField("getManyOrders", {
+  type: nonNull(list(Order)),
+  args: {
+    where: nonNull(getOrdersInput),
+  },
+  //@ts-ignore
+  resolve: async (_root, args, ctx) => {
+    return ctx.prisma.order.findMany({
+      where: {
+        userId: args.where.userId,
+      },
+    });
+  },
+});
+
+export const deleteOrder = mutationField("deleteOrder", {
+  type: nonNull(Order),
+  args: {
+    where: nonNull(getOrderInput),
+  },
+  //@ts-ignore
+  resolve: async (_root, args, ctx) => {
+    return ctx.prisma.order.delete({
       where: {
         id: args.where.id,
       },

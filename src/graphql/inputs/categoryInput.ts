@@ -6,3 +6,10 @@ export const createCategoryInput = inputObjectType({
     t.nonNull.string("name");
   },
 });
+
+export const getOneCategoryWhereUniqueInput = inputObjectType({
+  name: "getOneCategoryWhereUniqueInput",
+  definition(t) {
+    t.nonNull.int("id");
+  },
+});

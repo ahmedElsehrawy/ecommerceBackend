@@ -4,3 +4,5 @@ export * from "./addressInput";
 export * from "./orderItemInput";
 export * from "./productInput";
 export * from "./categoryInput";
+export * from "./cartInput";
+export * from "./discountInput";

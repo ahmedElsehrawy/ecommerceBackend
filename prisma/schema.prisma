@@ -22,6 +22,7 @@ model User {
   updatedAt DateTime
   Order     Order[]
   Address   Address[]
+  cart      Cart?
 }
 
 model Order {
@@ -75,6 +76,7 @@ model Product {
   Inventory   Inventory[]
   createdAt   DateTime
   updatedAt   DateTime
+  CartItem    CartItem[]
 }
 
 model Category {
@@ -102,6 +104,22 @@ model Inventory {
   quantity  Int
   size      String? @db.VarChar(20)
   color     String? @db.VarChar(20)
+}
+
+model Cart {
+  id       Int        @id @default(autoincrement())
+  user     User       @relation(fields: [userId], references: [id])
+  userId   Int        @unique
+  CartItem CartItem[]
+}
+
+model CartItem {
+  id        Int     @id @default(autoincrement())
+  cart      Cart    @relation(fields: [cartId], references: [id])
+  cartId    Int
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  quantity  Int
 }
 
 enum OrderStatus {
