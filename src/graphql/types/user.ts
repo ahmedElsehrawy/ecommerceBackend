@@ -62,7 +62,52 @@ export const deleteUser = mutationField("deleteUser", {
   },
   //@ts-ignore
   resolve: async (_root, args, ctx) => {
-    return ctx.prisma.user.delete({
+    const cart = await ctx.prisma.cart.findUnique({
+      where: {
+        userId: args.where.id,
+      },
+    });
+    await ctx.prisma.cartItem.deleteMany({
+      where: {
+        cartId: cart?.id,
+      },
+    });
+
+    await ctx.prisma.cart.delete({
+      where: {
+        userId: args.where.id,
+      },
+    });
+
+    const orders = await ctx.prisma.order.findMany({
+      where: {
+        userId: args.where.id,
+      },
+    });
+
+    let ordersIds = orders.map((order) => order.id);
+
+    await ctx.prisma.orderItem.deleteMany({
+      where: {
+        orderId: {
+          in: ordersIds,
+        },
+      },
+    });
+
+    await ctx.prisma.order.deleteMany({
+      where: {
+        userId: args.where.id,
+      },
+    });
+
+    await ctx.prisma.address.deleteMany({
+      where: {
+        userId: args.where.id,
+      },
+    });
+
+    return await ctx.prisma.user.delete({
       where: {
         id: args.where.id,
       },
