@@ -6,6 +6,7 @@ import {
   updateProdcutInput,
   updateProdcutWhereUniqueId,
 } from "../inputs";
+import { Category } from "./category";
 
 export const Product = objectType({
   name: "Product",
@@ -15,6 +16,7 @@ export const Product = objectType({
     t.string("description");
     t.string("image");
     t.int("categoryId");
+    t.field("category", { type: Category });
     t.float("price");
     t.nullable.int("discountId");
     t.string("createdAt");
@@ -34,6 +36,9 @@ export const createProduct = mutationField("createProduct", {
         ...args.input,
         createdAt: new Date(),
         updatedAt: new Date(),
+      },
+      include: {
+        category: true,
       },
     });
   },
@@ -58,6 +63,9 @@ export const updateProdcut = mutationField("updateProdcut", {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        include: {
+          category: true,
+        },
       })
       .catch((error) => console.log(error));
   },
@@ -74,8 +82,12 @@ export const getProduct = queryField("getProduct", {
       where: {
         id: args.where.id,
       },
+      include: {
+        category: true,
+      },
     });
 
+    console.log(product);
     if (product?.discountId) {
       const discount = await ctx.prisma.discount.findUnique({
         where: {
@@ -96,7 +108,7 @@ export const getProduct = queryField("getProduct", {
   },
 });
 
-export const getProducts = queryField("getProducts", {
+export const getProductsByCategory = queryField("getProductsByCategory", {
   type: nonNull(list(Product)),
   args: {
     where: nonNull(getProductsInput),
@@ -106,6 +118,9 @@ export const getProducts = queryField("getProducts", {
     const products = await ctx.prisma.product.findMany({
       where: {
         categoryId: args.where.categoryId,
+      },
+      include: {
+        category: true,
       },
     });
     let productsAfterCalculations = await products.map(async (product) => {
@@ -138,6 +153,9 @@ export const deleteProduct = mutationField("deleteProduct", {
     return ctx.prisma.product.delete({
       where: {
         id: args.where.id,
+      },
+      include: {
+        category: true,
       },
     });
   },

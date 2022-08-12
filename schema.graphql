@@ -14,8 +14,8 @@ type Address {
 }
 
 type Cart {
+  CartItem: [CartItem!]
   id: Int!
-  items: [CartItem!]!
   totalPrice: Float!
   userId: Int!
 }
@@ -23,7 +23,7 @@ type Cart {
 type CartItem {
   cartId: Int!
   id: Int!
-  productId: Int!
+  product: Product!
   quantity: Int!
 }
 
@@ -61,7 +61,8 @@ type Mutation {
 }
 
 type Order {
-  addressId: Int!
+  OrderItem: [orderItem!]!
+  address: Address!
   createdAt: String!
   id: Int!
   orderStatus: OrderStatus!
@@ -78,6 +79,7 @@ enum OrderStatus {
 }
 
 type Product {
+  category: Category!
   categoryId: Int!
   createdAt: String!
   description: String!
@@ -99,13 +101,16 @@ type Query {
   getOneOrder(where: getOrderInput!): Order!
   getOrderItems(where: getOrderItemsIdInput!): [orderItem!]!
   getProduct(where: getProductInput!): Product!
-  getProducts(where: getProductsInput!): [Product!]!
+  getProductsByCategory(where: getProductsInput!): [Product!]!
   getUserAddresses(where: getUserAddressesInput!): [Address!]!
   user(where: UserWhereUniqueInput!): User!
 }
 
 type User {
+  Address: [Address!]!
+  Order: [Order!]!
   balance: Float!
+  cart: Cart!
   createdAt: String!
   email: String!
   firstName: String!
@@ -216,7 +221,7 @@ type orderItem {
   createdAt: String!
   id: Int!
   orderId: Int!
-  productId: Int!
+  product: Product!
   quantity: Int!
   updatedAt: String!
 }

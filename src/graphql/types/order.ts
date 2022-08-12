@@ -5,8 +5,11 @@ import {
   queryField,
   enumType,
   list,
+  nullable,
 } from "nexus";
 import { createOrderInput, getOrderInput, getOrdersInput } from "../inputs";
+import { Address } from "./address";
+import { OrderItem } from "./orderItem";
 
 export const Order = objectType({
   name: "Order",
@@ -15,7 +18,8 @@ export const Order = objectType({
     t.int("userId");
     t.field("orderStatus", { type: OrderStatus });
     t.float("totalPrice");
-    t.int("addressId");
+    t.field("address", { type: nonNull(Address) });
+    t.field("OrderItem", { type: list(OrderItem) });
     t.string("createdAt");
     t.string("updatedAt");
   },
@@ -51,9 +55,13 @@ export const getOneOrder = queryField("getOneOrder", {
   },
   //@ts-ignore
   resolve: async (_root, args, ctx) => {
-    return ctx.prisma.order.findUnique({
+    return await ctx.prisma.order.findUnique({
       where: {
         id: args.where.id,
+      },
+      include: {
+        OrderItem: true,
+        address: true,
       },
     });
   },

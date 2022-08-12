@@ -132,15 +132,15 @@ export interface NexusGenObjects {
     userId: number; // Int!
   }
   Cart: { // root type
+    CartItem?: NexusGenRootTypes['CartItem'][] | null; // [CartItem!]
     id: number; // Int!
-    items: NexusGenRootTypes['CartItem'][]; // [CartItem!]!
     totalPrice: number; // Float!
     userId: number; // Int!
   }
   CartItem: { // root type
     cartId: number; // Int!
     id: number; // Int!
-    productId: number; // Int!
+    product: NexusGenRootTypes['Product']; // Product!
     quantity: number; // Int!
   }
   Category: { // root type
@@ -159,7 +159,8 @@ export interface NexusGenObjects {
   }
   Mutation: {};
   Order: { // root type
-    addressId: number; // Int!
+    OrderItem: NexusGenRootTypes['orderItem'][]; // [orderItem!]!
+    address: NexusGenRootTypes['Address']; // Address!
     createdAt: string; // String!
     id: number; // Int!
     orderStatus: NexusGenEnums['OrderStatus']; // OrderStatus!
@@ -168,6 +169,7 @@ export interface NexusGenObjects {
     userId: number; // Int!
   }
   Product: { // root type
+    category: NexusGenRootTypes['Category']; // Category!
     categoryId: number; // Int!
     createdAt: string; // String!
     description: string; // String!
@@ -180,7 +182,10 @@ export interface NexusGenObjects {
   }
   Query: {};
   User: { // root type
+    Address: NexusGenRootTypes['Address'][]; // [Address!]!
+    Order: NexusGenRootTypes['Order'][]; // [Order!]!
     balance: number; // Float!
+    cart: NexusGenRootTypes['Cart']; // Cart!
     createdAt: string; // String!
     email: string; // String!
     firstName: string; // String!
@@ -194,7 +199,7 @@ export interface NexusGenObjects {
     createdAt: string; // String!
     id: number; // Int!
     orderId: number; // Int!
-    productId: number; // Int!
+    product: NexusGenRootTypes['Product']; // Product!
     quantity: number; // Int!
     updatedAt: string; // String!
   }
@@ -222,15 +227,15 @@ export interface NexusGenFieldTypes {
     userId: number; // Int!
   }
   Cart: { // field return type
+    CartItem: NexusGenRootTypes['CartItem'][] | null; // [CartItem!]
     id: number; // Int!
-    items: NexusGenRootTypes['CartItem'][]; // [CartItem!]!
     totalPrice: number; // Float!
     userId: number; // Int!
   }
   CartItem: { // field return type
     cartId: number; // Int!
     id: number; // Int!
-    productId: number; // Int!
+    product: NexusGenRootTypes['Product']; // Product!
     quantity: number; // Int!
   }
   Category: { // field return type
@@ -264,7 +269,8 @@ export interface NexusGenFieldTypes {
     updateProdcut: NexusGenRootTypes['Product']; // Product!
   }
   Order: { // field return type
-    addressId: number; // Int!
+    OrderItem: NexusGenRootTypes['orderItem'][]; // [orderItem!]!
+    address: NexusGenRootTypes['Address']; // Address!
     createdAt: string; // String!
     id: number; // Int!
     orderStatus: NexusGenEnums['OrderStatus']; // OrderStatus!
@@ -273,6 +279,7 @@ export interface NexusGenFieldTypes {
     userId: number; // Int!
   }
   Product: { // field return type
+    category: NexusGenRootTypes['Category']; // Category!
     categoryId: number; // Int!
     createdAt: string; // String!
     description: string; // String!
@@ -293,12 +300,15 @@ export interface NexusGenFieldTypes {
     getOneOrder: NexusGenRootTypes['Order']; // Order!
     getOrderItems: NexusGenRootTypes['orderItem'][]; // [orderItem!]!
     getProduct: NexusGenRootTypes['Product']; // Product!
-    getProducts: NexusGenRootTypes['Product'][]; // [Product!]!
+    getProductsByCategory: NexusGenRootTypes['Product'][]; // [Product!]!
     getUserAddresses: NexusGenRootTypes['Address'][]; // [Address!]!
     user: NexusGenRootTypes['User']; // User!
   }
   User: { // field return type
+    Address: NexusGenRootTypes['Address'][]; // [Address!]!
+    Order: NexusGenRootTypes['Order'][]; // [Order!]!
     balance: number; // Float!
+    cart: NexusGenRootTypes['Cart']; // Cart!
     createdAt: string; // String!
     email: string; // String!
     firstName: string; // String!
@@ -312,7 +322,7 @@ export interface NexusGenFieldTypes {
     createdAt: string; // String!
     id: number; // Int!
     orderId: number; // Int!
-    productId: number; // Int!
+    product: NexusGenRootTypes['Product']; // Product!
     quantity: number; // Int!
     updatedAt: string; // String!
   }
@@ -330,15 +340,15 @@ export interface NexusGenFieldTypeNames {
     userId: 'Int'
   }
   Cart: { // field return type name
+    CartItem: 'CartItem'
     id: 'Int'
-    items: 'CartItem'
     totalPrice: 'Float'
     userId: 'Int'
   }
   CartItem: { // field return type name
     cartId: 'Int'
     id: 'Int'
-    productId: 'Int'
+    product: 'Product'
     quantity: 'Int'
   }
   Category: { // field return type name
@@ -372,7 +382,8 @@ export interface NexusGenFieldTypeNames {
     updateProdcut: 'Product'
   }
   Order: { // field return type name
-    addressId: 'Int'
+    OrderItem: 'orderItem'
+    address: 'Address'
     createdAt: 'String'
     id: 'Int'
     orderStatus: 'OrderStatus'
@@ -381,6 +392,7 @@ export interface NexusGenFieldTypeNames {
     userId: 'Int'
   }
   Product: { // field return type name
+    category: 'Category'
     categoryId: 'Int'
     createdAt: 'String'
     description: 'String'
@@ -401,12 +413,15 @@ export interface NexusGenFieldTypeNames {
     getOneOrder: 'Order'
     getOrderItems: 'orderItem'
     getProduct: 'Product'
-    getProducts: 'Product'
+    getProductsByCategory: 'Product'
     getUserAddresses: 'Address'
     user: 'User'
   }
   User: { // field return type name
+    Address: 'Address'
+    Order: 'Order'
     balance: 'Float'
+    cart: 'Cart'
     createdAt: 'String'
     email: 'String'
     firstName: 'String'
@@ -420,7 +435,7 @@ export interface NexusGenFieldTypeNames {
     createdAt: 'String'
     id: 'Int'
     orderId: 'Int'
-    productId: 'Int'
+    product: 'Product'
     quantity: 'Int'
     updatedAt: 'String'
   }
@@ -497,7 +512,7 @@ export interface NexusGenArgTypes {
     getProduct: { // args
       where: NexusGenInputs['getProductInput']; // getProductInput!
     }
-    getProducts: { // args
+    getProductsByCategory: { // args
       where: NexusGenInputs['getProductsInput']; // getProductsInput!
     }
     getUserAddresses: { // args

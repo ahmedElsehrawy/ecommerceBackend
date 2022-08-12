@@ -1,5 +1,8 @@
-import { mutationField, nonNull, objectType, queryField } from "nexus";
+import { list, mutationField, nonNull, objectType, queryField } from "nexus";
 import { registerInput, UserWhereUniqueInput } from "../inputs";
+import { Address } from "./address";
+import { Cart } from "./cart";
+import { Order } from "./order";
 
 export const User = objectType({
   name: "User",
@@ -11,6 +14,9 @@ export const User = objectType({
     t.string("password");
     t.float("balance");
     t.string("phone");
+    t.field("Address", { type: list(Address) });
+    t.field("cart", { type: Cart });
+    t.field("Order", { type: list(Order) });
     t.string("createdAt");
     t.string("updatedAt");
   },
@@ -23,11 +29,99 @@ export const user = queryField("user", {
   },
   //@ts-ignore
   resolve: async (_root, args, ctx) => {
-    return ctx.prisma.user.findUnique({
+    let user = await ctx.prisma.user.findUnique({
       where: {
         id: args.where.id,
       },
+      include: {
+        Address: true,
+        cart: {
+          include: {
+            CartItem: {
+              include: {
+                product: {
+                  include: {
+                    category: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+        Order: {
+          include: {
+            OrderItem: true,
+            address: true,
+          },
+        },
+      },
     });
+
+    const cart = await ctx.prisma.cart.findUnique({
+      where: {
+        id: args.where.id,
+      },
+      include: {
+        CartItem: true,
+      },
+    });
+
+    const cartItems = await ctx.prisma.cartItem.findMany({
+      where: {
+        cartId: cart?.id,
+      },
+    });
+
+    let totalPrice: number = 0;
+    const calculateTotalPrice = async (productId: number, quantity: number) => {
+      let currentProduct = await ctx.prisma.product.findUnique({
+        where: {
+          id: productId,
+        },
+      });
+
+      if (!currentProduct?.discountId) {
+        totalPrice += Number(currentProduct?.price) * Number(quantity);
+      } else {
+        const discount = await ctx.prisma.discount.findUnique({
+          where: {
+            id: currentProduct.discountId,
+          },
+        });
+        let priceAfterDiscount =
+          Number(currentProduct.price) -
+          (Number(currentProduct.price) * Number(discount?.percent)) / 100;
+
+        totalPrice += Number(priceAfterDiscount) * Number(quantity);
+      }
+    };
+
+    for (let i = 0; i < cartItems.length; i++) {
+      await calculateTotalPrice(cartItems[i].productId, cartItems[i].quantity);
+    }
+
+    let newCartItems = cartItems.map(async (item) => {
+      let product = await ctx.prisma.product.findUnique({
+        where: {
+          id: item.productId,
+        },
+      });
+
+      return {
+        ...cartItems[0],
+        productId: null,
+        product: product,
+      };
+    });
+
+    return {
+      ...user,
+      cart: {
+        ...cart,
+        CartItem: newCartItems,
+        totalPrice: totalPrice.toFixed(2),
+      },
+    };
   },
 });
 

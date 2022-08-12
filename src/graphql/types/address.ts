@@ -30,6 +30,9 @@ export const createAddress = mutationField("createAddress", {
       data: {
         ...args.input,
       },
+      include: {
+        user: true,
+      },
     });
   },
 });
