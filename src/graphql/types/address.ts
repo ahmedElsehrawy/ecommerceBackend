@@ -1,4 +1,5 @@
 import { list, mutationField, nonNull, objectType, queryField } from "nexus";
+import { checkAuth } from "../../utils/auth";
 import {
   createAddressInput,
   getUserAddressesInput,
@@ -59,11 +60,17 @@ export const getOneAddress = queryField("getOneAddress", {
   },
   //@ts-ignore
   resolve: async (_root, args, ctx) => {
-    return ctx.prisma.address.findUnique({
+    let address = await ctx.prisma.address.findUnique({
       where: {
         id: args.where.id,
       },
     });
+
+    if (!address) {
+      throw new Error("address not Found");
+    }
+
+    return address;
   },
 });
 
@@ -74,6 +81,16 @@ export const deleteAddress = mutationField("deleteAddress", {
   },
   //@ts-ignore
   resolve: async (_root, args, ctx) => {
+    const user = checkAuth(ctx);
+    const address = await ctx.prisma.address.findUnique({
+      where: {
+        id: args.where.id,
+      },
+    });
+    //@ts-ignore
+    if (address?.userId !== user?.id) {
+      throw new Error("not allowed to do that");
+    }
     return ctx.prisma.address.delete({
       where: {
         id: args.where.id,

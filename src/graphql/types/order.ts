@@ -5,7 +5,6 @@ import {
   queryField,
   enumType,
   list,
-  nullable,
 } from "nexus";
 import { createOrderInput, getOrderInput, getOrdersInput } from "../inputs";
 import { Address } from "./address";

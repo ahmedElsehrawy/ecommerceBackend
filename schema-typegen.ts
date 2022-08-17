@@ -92,6 +92,10 @@ export interface NexusGenInputs {
   getUserWhereUniqueInput: { // input type
     id: number; // Int!
   }
+  loginInput: { // input type
+    email: string; // String!
+    password: string; // String!
+  }
   removeCartItemWhereUniqueInput: { // input type
     id: number; // Int!
   }
@@ -110,6 +114,7 @@ export interface NexusGenInputs {
 
 export interface NexusGenEnums {
   OrderStatus: "CANCELED" | "COMPLETED" | "ONGOING"
+  Role: "CUSTOMER" | "VENDOR"
 }
 
 export interface NexusGenScalars {
@@ -179,6 +184,7 @@ export interface NexusGenObjects {
     name: string; // String!
     price: number; // Float!
     updatedAt: string; // String!
+    vendorId: number; // Int!
   }
   Query: {};
   User: { // root type
@@ -193,6 +199,8 @@ export interface NexusGenObjects {
     lastName: string; // String!
     password: string; // String!
     phone: string; // String!
+    role: NexusGenEnums['Role']; // Role!
+    token: string; // String!
     updatedAt: string; // String!
   }
   orderItem: { // root type
@@ -289,6 +297,7 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     price: number; // Float!
     updatedAt: string; // String!
+    vendorId: number; // Int!
   }
   Query: { // field return type
     createDiscount: NexusGenRootTypes['Discount']; // Discount!
@@ -302,6 +311,7 @@ export interface NexusGenFieldTypes {
     getProduct: NexusGenRootTypes['Product']; // Product!
     getProductsByCategory: NexusGenRootTypes['Product'][]; // [Product!]!
     getUserAddresses: NexusGenRootTypes['Address'][]; // [Address!]!
+    login: NexusGenRootTypes['User']; // User!
     user: NexusGenRootTypes['User']; // User!
   }
   User: { // field return type
@@ -316,6 +326,8 @@ export interface NexusGenFieldTypes {
     lastName: string; // String!
     password: string; // String!
     phone: string; // String!
+    role: NexusGenEnums['Role']; // Role!
+    token: string; // String!
     updatedAt: string; // String!
   }
   orderItem: { // field return type
@@ -402,6 +414,7 @@ export interface NexusGenFieldTypeNames {
     name: 'String'
     price: 'Float'
     updatedAt: 'String'
+    vendorId: 'Int'
   }
   Query: { // field return type name
     createDiscount: 'Discount'
@@ -415,6 +428,7 @@ export interface NexusGenFieldTypeNames {
     getProduct: 'Product'
     getProductsByCategory: 'Product'
     getUserAddresses: 'Address'
+    login: 'User'
     user: 'User'
   }
   User: { // field return type name
@@ -429,6 +443,8 @@ export interface NexusGenFieldTypeNames {
     lastName: 'String'
     password: 'String'
     phone: 'String'
+    role: 'Role'
+    token: 'String'
     updatedAt: 'String'
   }
   orderItem: { // field return type name
@@ -518,8 +534,8 @@ export interface NexusGenArgTypes {
     getUserAddresses: { // args
       where: NexusGenInputs['getUserAddressesInput']; // getUserAddressesInput!
     }
-    user: { // args
-      where: NexusGenInputs['UserWhereUniqueInput']; // UserWhereUniqueInput!
+    login: { // args
+      input: NexusGenInputs['loginInput']; // loginInput!
     }
   }
 }

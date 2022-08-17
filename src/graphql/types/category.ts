@@ -35,11 +35,17 @@ export const getOneCategory = queryField("getOneCategory", {
   },
   //@ts-ignore
   resolve: async (_root, args, ctx) => {
-    return ctx.prisma.category.findUnique({
+    let category = await ctx.prisma.category.findUnique({
       where: {
         id: args.where.id,
       },
     });
+
+    if (!category) {
+      throw new Error("no category found");
+    }
+
+    return category;
   },
 });
 

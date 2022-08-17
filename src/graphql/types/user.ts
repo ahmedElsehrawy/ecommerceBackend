@@ -1,8 +1,22 @@
-import { list, mutationField, nonNull, objectType, queryField } from "nexus";
-import { registerInput, UserWhereUniqueInput } from "../inputs";
+import {
+  enumType,
+  list,
+  mutationField,
+  nonNull,
+  objectType,
+  queryField,
+} from "nexus";
+import bcrypt from "bcryptjs";
+import { loginInput, registerInput, UserWhereUniqueInput } from "../inputs";
 import { Address } from "./address";
 import { Cart } from "./cart";
 import { Order } from "./order";
+import { checkAuth, generateToken } from "../../utils/auth";
+
+export const Role = enumType({
+  name: "Role",
+  members: ["CUSTOMER", "VENDOR"],
+});
 
 export const User = objectType({
   name: "User",
@@ -14,6 +28,8 @@ export const User = objectType({
     t.string("password");
     t.float("balance");
     t.string("phone");
+    t.string("token");
+    t.field("role", { type: Role });
     t.field("Address", { type: list(Address) });
     t.field("cart", { type: Cart });
     t.field("Order", { type: list(Order) });
@@ -24,14 +40,14 @@ export const User = objectType({
 
 export const user = queryField("user", {
   type: nonNull(User),
-  args: {
-    where: nonNull(UserWhereUniqueInput),
-  },
   //@ts-ignore
   resolve: async (_root, args, ctx) => {
+    const userAuth = await checkAuth(ctx);
+
     let user = await ctx.prisma.user.findUnique({
       where: {
-        id: args.where.id,
+        //@ts-ignore
+        id: userAuth?.id,
       },
       include: {
         Address: true,
@@ -59,7 +75,7 @@ export const user = queryField("user", {
 
     const cart = await ctx.prisma.cart.findUnique({
       where: {
-        id: args.where.id,
+        userId: user?.id,
       },
       include: {
         CartItem: true,
@@ -100,7 +116,7 @@ export const user = queryField("user", {
       await calculateTotalPrice(cartItems[i].productId, cartItems[i].quantity);
     }
 
-    let newCartItems = cartItems.map(async (item) => {
+    let newCartItems: any = cartItems.map(async (item: any) => {
       let product = await ctx.prisma.product.findUnique({
         where: {
           id: item.productId,
@@ -125,6 +141,48 @@ export const user = queryField("user", {
   },
 });
 
+export const login = queryField("login", {
+  type: nonNull(User),
+  args: {
+    input: nonNull(loginInput),
+  },
+  //@ts-ignore
+  resolve: async (_root, args, ctx) => {
+    const user = await ctx.prisma.user.findFirst({
+      where: {
+        email: args.input.email,
+      },
+    });
+
+    if (!user) {
+      throw new Error("User Not Found");
+    }
+
+    const passwordMatch = await bcrypt.compare(
+      args.input.password,
+      user.password
+    );
+
+    if (!passwordMatch) {
+      throw new Error("Wrong Credentials");
+    }
+
+    const token = generateToken(user);
+
+    await ctx.prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        //@ts-ignore
+        token: JSON.stringify(token),
+      },
+    });
+
+    return user;
+  },
+});
+
 export const register = mutationField("register", {
   type: nonNull(User),
   args: {
@@ -132,11 +190,37 @@ export const register = mutationField("register", {
   },
   //@ts-ignore
   resolve: async (_root, args, ctx) => {
+    const user = await ctx.prisma.user.findFirst({
+      where: {
+        email: args.input.email,
+      },
+    });
+
+    if (user) {
+      throw new Error("email already taken");
+    }
+
+    const hashedPassword = await bcrypt.hash(args.input.password, 12);
+
+    //@ts-ignore
     let createdUser = await ctx.prisma.user.create({
       data: {
         ...args.input,
+        password: hashedPassword,
         createdAt: new Date(),
         updatedAt: new Date(),
+      },
+    });
+
+    const token = generateToken(createdUser);
+
+    await ctx.prisma.user.update({
+      where: {
+        id: createdUser.id,
+      },
+      data: {
+        //@ts-ignore
+        token: JSON.stringify(token),
       },
     });
     await ctx.prisma.cart.create({
@@ -156,6 +240,12 @@ export const deleteUser = mutationField("deleteUser", {
   },
   //@ts-ignore
   resolve: async (_root, args, ctx) => {
+    const user = checkAuth(ctx);
+
+    //@ts-ignore
+    if (user?.id !== args.where.id) {
+      throw new Error("not allowed to do that");
+    }
     const cart = await ctx.prisma.cart.findUnique({
       where: {
         userId: args.where.id,

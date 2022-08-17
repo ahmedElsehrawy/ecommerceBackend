@@ -3,6 +3,7 @@ import { ApolloServer } from "apollo-server-express";
 import { createServer } from "http";
 import { createContext } from "./context";
 import { schema } from "./schema";
+import { ApolloServerPluginLandingPageLocalDefault } from "apollo-server-core";
 
 async function startApolloServer() {
   const app = express();
@@ -10,8 +11,10 @@ async function startApolloServer() {
 
   const apolloServer = new ApolloServer({
     schema: schema,
-    resolvers: {},
+    csrfPrevention: true,
+    cache: "bounded",
     context: createContext,
+    plugins: [ApolloServerPluginLandingPageLocalDefault],
   });
 
   await apolloServer.start();

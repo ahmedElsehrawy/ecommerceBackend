@@ -15,14 +15,17 @@ model User {
   firstName String    @db.VarChar(20)
   lastName  String    @db.VarChar(20)
   email     String    @unique @db.VarChar(50)
-  password  String    @db.VarChar(50)
+  password  String    @db.Text
   balance   Decimal   @default(0) @db.Money
   phone     String    @db.VarChar(20)
   createdAt DateTime
   updatedAt DateTime
+  role      Role      @default(CUSTOMER)
+  token     String?   @db.Text
   Order     Order[]
   Address   Address[]
   cart      Cart?
+  Product   Product[]
 }
 
 model Order {
@@ -72,6 +75,8 @@ model Product {
   categoryId  Int
   discount    Discount?   @relation(fields: [discountId], references: [id])
   discountId  Int?
+  vendor      User        @relation(fields: [vendorId], references: [id])
+  vendorId    Int
   OrderItem   OrderItem[]
   Inventory   Inventory[]
   createdAt   DateTime
@@ -126,4 +131,9 @@ enum OrderStatus {
   COMPLETED
   ONGOING
   CANCELED
+}
+
+enum Role {
+  CUSTOMER
+  VENDOR
 }

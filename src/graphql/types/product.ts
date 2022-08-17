@@ -1,4 +1,5 @@
 import { list, mutationField, nonNull, objectType, queryField } from "nexus";
+import { checkAuth } from "../../utils/auth";
 import {
   createProductInput,
   getProductInput,
@@ -16,6 +17,7 @@ export const Product = objectType({
     t.string("description");
     t.string("image");
     t.int("categoryId");
+    t.int("vendorId");
     t.field("category", { type: Category });
     t.float("price");
     t.nullable.int("discountId");
@@ -31,11 +33,24 @@ export const createProduct = mutationField("createProduct", {
   },
   //@ts-ignore
   resolve: async (_root, args, ctx) => {
+    const user = checkAuth(ctx);
+
+    if (!user) {
+      throw new Error("not authenticated");
+    }
+
+    //@ts-ignore
+    if (user.role !== "VENDOR") {
+      throw new Error("sorry not allowed fot this user");
+    }
+
     return ctx.prisma.product.create({
       data: {
         ...args.input,
         createdAt: new Date(),
         updatedAt: new Date(),
+        //@ts-ignore
+        vendorId: user.id,
       },
       include: {
         category: true,
@@ -52,6 +67,18 @@ export const updateProdcut = mutationField("updateProdcut", {
   },
   //@ts-ignore
   resolve: async (_root, args, ctx) => {
+    const user = checkAuth(ctx);
+
+    const product = await ctx.prisma.product.findUnique({
+      where: {
+        id: args.productId.id,
+      },
+    });
+    //@ts-ignore
+    if (product?.vendorId !== user.id) {
+      throw new Error("not allowed");
+    }
+
     return ctx.prisma.product
       .update({
         where: {
@@ -150,6 +177,18 @@ export const deleteProduct = mutationField("deleteProduct", {
   },
   //@ts-ignore
   resolve: async (_root, args, ctx) => {
+    const user = checkAuth(ctx);
+
+    const product = await ctx.prisma.product.findUnique({
+      where: {
+        id: args.where.id,
+      },
+    });
+    //@ts-ignore
+    if (product?.vendorId !== user?.id) {
+      throw new Error("not allowed to do that");
+    }
+
     return ctx.prisma.product.delete({
       where: {
         id: args.where.id,

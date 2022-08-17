@@ -7,6 +7,14 @@ export const UserWhereUniqueInput = inputObjectType({
   },
 });
 
+export const loginInput = inputObjectType({
+  name: "loginInput",
+  definition(t) {
+    t.nonNull.string("email");
+    t.nonNull.string("password");
+  },
+});
+
 export const registerInput = inputObjectType({
   name: "createUserInput",
   definition(t) {

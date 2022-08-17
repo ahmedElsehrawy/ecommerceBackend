@@ -89,6 +89,7 @@ type Product {
   name: String!
   price: Float!
   updatedAt: String!
+  vendorId: Int!
 }
 
 type Query {
@@ -103,7 +104,13 @@ type Query {
   getProduct(where: getProductInput!): Product!
   getProductsByCategory(where: getProductsInput!): [Product!]!
   getUserAddresses(where: getUserAddressesInput!): [Address!]!
-  user(where: UserWhereUniqueInput!): User!
+  login(input: loginInput!): User!
+  user: User!
+}
+
+enum Role {
+  CUSTOMER
+  VENDOR
 }
 
 type User {
@@ -118,6 +125,8 @@ type User {
   lastName: String!
   password: String!
   phone: String!
+  role: Role!
+  token: String!
   updatedAt: String!
 }
 
@@ -215,6 +224,11 @@ input getUserAddressesInput {
 
 input getUserWhereUniqueInput {
   id: Int!
+}
+
+input loginInput {
+  email: String!
+  password: String!
 }
 
 type orderItem {
