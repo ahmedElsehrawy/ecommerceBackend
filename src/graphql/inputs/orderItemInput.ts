@@ -7,11 +7,11 @@ export const getOrderItemsIdInput = inputObjectType({
   },
 });
 
-export const createOrderItemInput = inputObjectType({
-  name: "createOrderItemInput",
-  definition(t) {
-    t.int("orderId");
-    t.int("productId");
-    t.int("quantity");
-  },
-});
+// export const createOrderItemInput = inputObjectType({
+//   name: "createOrderItemInput",
+//   definition(t) {
+//    // t.nonNull.int("orderId");
+//     t.nonNull.int("productId");
+//     t.nonNull.int("quantity");
+//   },
+// });

@@ -6,8 +6,14 @@ import {
   objectType,
   queryField,
 } from "nexus";
+//@ts-ignore
 import bcrypt from "bcryptjs";
-import { loginInput, registerInput, UserWhereUniqueInput } from "../inputs";
+import {
+  loginInput,
+  registerInput,
+  resetPaswwordInput,
+  UserWhereUniqueInput,
+} from "../inputs";
 import { Address } from "./address";
 import { Cart } from "./cart";
 import { Order } from "./order";
@@ -66,7 +72,11 @@ export const user = queryField("user", {
         },
         Order: {
           include: {
-            OrderItem: true,
+            OrderItem: {
+              include: {
+                product: true,
+              },
+            },
             address: true,
           },
         },
@@ -141,7 +151,7 @@ export const user = queryField("user", {
   },
 });
 
-export const login = queryField("login", {
+export const login = mutationField("login", {
   type: nonNull(User),
   args: {
     input: nonNull(loginInput),
@@ -151,6 +161,13 @@ export const login = queryField("login", {
     const user = await ctx.prisma.user.findFirst({
       where: {
         email: args.input.email,
+      },
+      include: {
+        cart: {
+          include: {
+            CartItem: true,
+          },
+        },
       },
     });
 
@@ -178,6 +195,7 @@ export const login = queryField("login", {
         token: JSON.stringify(token),
       },
     });
+    console.log("🚀 ~ file: user.ts ~ line 192 ~ resolve: ~ user", user);
 
     return user;
   },
@@ -211,6 +229,10 @@ export const register = mutationField("register", {
         updatedAt: new Date(),
       },
     });
+    console.log(
+      "🚀 ~ file: user.ts ~ line 234 ~ resolve: ~ createdUser",
+      createdUser
+    );
 
     const token = generateToken(createdUser);
 
@@ -229,7 +251,58 @@ export const register = mutationField("register", {
       },
     });
 
-    return createdUser;
+    let finalCreatedUser = await ctx.prisma.user.findUnique({
+      where: {
+        id: createdUser?.id,
+      },
+
+      include: {
+        cart: {
+          include: {
+            CartItem: true,
+          },
+        },
+      },
+    });
+
+    return finalCreatedUser;
+  },
+});
+
+export const resetPassword = mutationField("resetPassword", {
+  type: nonNull(User),
+  args: {
+    input: nonNull(resetPaswwordInput),
+  },
+  //@ts-ignore
+  resolve: async (_root, args, ctx) => {
+    const auth = checkAuth(ctx);
+
+    const user = await ctx.prisma.user.findUnique({
+      where: {
+        id: auth.id,
+      },
+    });
+
+    const passwordMatch = await bcrypt.compare(
+      args.input.oldPassword,
+      user?.password
+    );
+
+    if (!passwordMatch) {
+      throw new Error("Wrong Credentials");
+    }
+
+    const hashedPassword = await bcrypt.hash(args.input.newPassword, 12);
+
+    return ctx.prisma.user.update({
+      where: {
+        id: auth.id,
+      },
+      data: {
+        password: hashedPassword,
+      },
+    });
   },
 });
 

@@ -1,5 +1,14 @@
-import { list, mutationField, nonNull, objectType, queryField } from "nexus";
+import {
+  extendType,
+  intArg,
+  list,
+  mutationField,
+  nonNull,
+  objectType,
+  queryField,
+} from "nexus";
 import { checkAuth } from "../../utils/auth";
+import { configureDate } from "../../utils/dates";
 import {
   createProductInput,
   getProductInput,
@@ -8,6 +17,17 @@ import {
   updateProdcutWhereUniqueId,
 } from "../inputs";
 import { Category } from "./category";
+import { Inventory } from "./inventory";
+
+export const ProductImage = objectType({
+  name: "ProductImage",
+  definition(t) {
+    t.int("id");
+    t.string("url");
+    t.field("product", { type: Product });
+    t.int("productId");
+  },
+});
 
 export const Product = objectType({
   name: "Product",
@@ -15,9 +35,11 @@ export const Product = objectType({
     t.int("id");
     t.string("name");
     t.string("description");
-    t.string("image");
+    t.string("mainImage");
+    t.field("Gallery", { type: list(ProductImage) });
     t.int("categoryId");
     t.int("vendorId");
+    t.nullable.field("inventory", { type: list(Inventory) });
     t.field("category", { type: Category });
     t.float("price");
     t.nullable.int("discountId");
@@ -33,27 +55,60 @@ export const createProduct = mutationField("createProduct", {
   },
   //@ts-ignore
   resolve: async (_root, args, ctx) => {
-    const user = checkAuth(ctx);
+    const user = await checkAuth(ctx);
 
     if (!user) {
       throw new Error("not authenticated");
     }
+    console.log("🚀 ~ file: product.ts ~ line 52 ~ resolve: ~ user", user);
 
     //@ts-ignore
     if (user.role !== "VENDOR") {
       throw new Error("sorry not allowed fot this user");
     }
 
-    return ctx.prisma.product.create({
+    const createdProduct = await ctx.prisma.product.create({
       data: {
-        ...args.input,
+        name: args.input.name,
+        description: args.input.description,
+        mainImage: args.input.mainImage,
+        price: args.input.price,
+        categoryId: args.input.categoryId,
+        discountId: args.input.discountId ? args.input.discountId : undefined,
         createdAt: new Date(),
         updatedAt: new Date(),
-        //@ts-ignore
         vendorId: user.id,
       },
       include: {
         category: true,
+        Gallery: true,
+      },
+    });
+    console.log(
+      "🚀 ~ file: product.ts ~ line 77 ~ resolve: ~ createdProduct",
+      createdProduct
+    );
+
+    //@ts-ignore
+    let images = args.input.gallery.map((image) => {
+      return {
+        ...image,
+        productId: createdProduct.id,
+      };
+    });
+
+    await ctx.prisma.productImage.createMany({
+      //@ts-ignore
+      data: images,
+    });
+
+    return ctx.prisma.product.findUnique({
+      where: {
+        id: createdProduct.id,
+      },
+      include: {
+        category: true,
+        Gallery: true,
       },
     });
   },
@@ -98,7 +153,7 @@ export const updateProdcut = mutationField("updateProdcut", {
   },
 });
 
-export const getProduct = queryField("getProduct", {
+export const getProduct = queryField("product", {
   type: nonNull(Product),
   args: {
     where: nonNull(getProductInput),
@@ -111,10 +166,11 @@ export const getProduct = queryField("getProduct", {
       },
       include: {
         category: true,
+        Inventory: true,
+        Gallery: true,
       },
     });
 
-    console.log(product);
     if (product?.discountId) {
       const discount = await ctx.prisma.discount.findUnique({
         where: {
@@ -131,42 +187,110 @@ export const getProduct = queryField("getProduct", {
       } else {
         return product;
       }
+    } else {
+      return product;
     }
   },
 });
 
-export const getProductsByCategory = queryField("getProductsByCategory", {
-  type: nonNull(list(Product)),
-  args: {
-    where: nonNull(getProductsInput),
-  },
-  //@ts-ignore
-  resolve: async (_root, args, ctx) => {
-    const products = await ctx.prisma.product.findMany({
-      where: {
-        categoryId: args.where.categoryId,
+// export const getProducts = queryField("getProducts", {
+//   type: nonNull(list(Product)),
+//   args: {
+//     where: nonNull(getProductsInput),
+//   },
+//   //@ts-ignore
+//   resolve: async (_root, args, ctx) => {
+//     const products = await ctx.prisma.product.findMany({
+//       where: {
+//         OR: [
+//           //@ts-ignore
+//           { categoryId: args.where.categoryId },
+//           //@ts-ignore
+//           { name: { contains: args.where.name } },
+//           //@ts-ignore
+//           { vendorId: args.where.vendorId },
+//         ],
+//       },
+//       include: {
+//         category: true,
+//         Inventory: true,
+//         Gallery: true,
+//       },
+//     });
+//     let productsAfterCalculations = await products.map(async (product) => {
+//       let discountValue = 0;
+//       if (product.discountId) {
+//         let discount = await ctx.prisma.discount.findUnique({
+//           where: {
+//             id: product.discountId,
+//           },
+//         });
+//         discountValue = discount?.active ? discount.percent : 0;
+//       }
+//       return {
+//         ...product,
+//         price:
+//           Number(product.price) - (Number(product.price) * discountValue) / 100,
+//       };
+//     });
+//     return productsAfterCalculations;
+//   },
+// });
+
+export const products = extendType({
+  type: "Query",
+  definition(t) {
+    t.field("products", {
+      type: objectType({
+        name: "products",
+        definition(t) {
+          t.int("count");
+          t.list.field("nodes", { type: Product });
+        },
+      }),
+      //@ts-ignore
+      args: {
+        skip: nonNull(intArg()),
+        take: nonNull(intArg()),
+        where: nonNull(getProductsInput),
       },
-      include: {
-        category: true,
-      },
-    });
-    let productsAfterCalculations = await products.map(async (product) => {
-      let discountValue = 0;
-      if (product.discountId) {
-        let discount = await ctx.prisma.discount.findUnique({
+      //@ts-ignore
+      resolve: async (_root, args, ctx) => {
+        let nodes = await ctx.prisma.product.findMany({
+          skip: args.skip,
+          take: args.take,
           where: {
-            id: product.discountId,
+            OR: [
+              //@ts-ignore
+              { categoryId: args.where.categoryId },
+              //@ts-ignore
+              { name: { contains: args.where.name } },
+              //@ts-ignore
+              { vendorId: args.where.vendorId },
+            ],
+          },
+          include: {
+            category: true,
+            Inventory: true,
+            Gallery: true,
           },
         });
-        discountValue = discount?.active ? discount.percent : 0;
-      }
-      return {
-        ...product,
-        price:
-          Number(product.price) - (Number(product.price) * discountValue) / 100,
-      };
+
+        let count = await ctx.prisma.product.count({});
+
+        let customizedNodes: any = nodes.map((node: any) => {
+          return {
+            ...node,
+            createdAt: configureDate(node.createdAt),
+            updatedAt: configureDate(node.updatedAt),
+          };
+        });
+        return {
+          count,
+          nodes: customizedNodes,
+        };
+      },
     });
-    return productsAfterCalculations;
   },
 });
 
@@ -185,8 +309,8 @@ export const deleteProduct = mutationField("deleteProduct", {
       },
     });
     //@ts-ignore
-    if (product?.vendorId !== user?.id) {
-      throw new Error("not allowed to do that");
+    if (product?.vendorId !== user.id) {
+      throw new Error("not allowed");
     }
 
     return ctx.prisma.product.delete({

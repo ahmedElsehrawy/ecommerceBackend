@@ -1,9 +1,14 @@
+//@ts-ignore
 import jwt from "jsonwebtoken";
 //@ts-ignore
 import { SECRET_KEY } from "../../config";
 
 export const checkAuth = (context: any) => {
   const authHeader = context.req.headers.authorization;
+  console.log(
+    "🚀 ~ file: auth.ts ~ line 7 ~ checkAuth ~ authHeader",
+    authHeader
+  );
 
   if (authHeader) {
     const token = authHeader.split(" ")[1];
@@ -27,6 +32,6 @@ export const generateToken = (createdUser: any) => {
       role: createdUser.role,
     },
     SECRET_KEY,
-    { expiresIn: "24h" }
+    { expiresIn: "365d" }
   );
 };

@@ -1,5 +1,5 @@
-import { list, nonNull, objectType, queryField, mutationField } from "nexus";
-import { createOrderItemInput, getOrderItemsIdInput } from "../inputs";
+import { list, nonNull, objectType, queryField } from "nexus";
+import { getOrderItemsIdInput } from "../inputs";
 import { Product } from "./product";
 
 export const OrderItem = objectType({
@@ -24,27 +24,6 @@ export const getOrderItems = queryField("getOrderItems", {
     return ctx.prisma.orderItem.findMany({
       where: {
         orderId: args.where.orderId,
-      },
-      include: {
-        product: true,
-      },
-    });
-  },
-});
-
-export const createOrderItem = mutationField("createOrderItem", {
-  type: nonNull(OrderItem),
-  args: {
-    input: nonNull(createOrderItemInput),
-  },
-  //@ts-ignore
-  resolve: async (_root, args, ctx) => {
-    return ctx.prisma.orderItem.create({
-      //@ts-ignore
-      data: {
-        ...args.input,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       },
       include: {
         product: true,

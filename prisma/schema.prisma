@@ -11,21 +11,32 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  firstName String    @db.VarChar(20)
-  lastName  String    @db.VarChar(20)
-  email     String    @unique @db.VarChar(50)
-  password  String    @db.Text
-  balance   Decimal   @default(0) @db.Money
-  phone     String    @db.VarChar(20)
+  id        Int         @id @default(autoincrement())
+  firstName String      @db.VarChar(20)
+  lastName  String      @db.VarChar(20)
+  email     String      @unique @db.VarChar(50)
+  password  String      @db.Text
+  balance   Decimal     @default(0) @db.Money
+  phone     String      @db.VarChar(20)
   createdAt DateTime
   updatedAt DateTime
-  role      Role      @default(CUSTOMER)
-  token     String?   @db.Text
+  role      Role        @default(CUSTOMER)
+  token     String?     @db.Text
   Order     Order[]
   Address   Address[]
   cart      Cart?
   Product   Product[]
+  Favourite Favourite[]
+  Discount  Discount[]
+  Category  Category[]
+}
+
+model Favourite {
+  id        Int     @id @default(autoincrement())
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
 }
 
 model Order {
@@ -61,35 +72,46 @@ model OrderItem {
   product   Product  @relation(fields: [productId], references: [id])
   productId Int
   quantity  Int
-  createdAt DateTime
-  updatedAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+model ProductImage {
+  id        Int      @id @default(autoincrement())
+  url       String
+  Product   Product? @relation(fields: [productId], references: [id])
+  productId Int?
 }
 
 model Product {
-  id          Int         @id @default(autoincrement())
-  name        String      @db.VarChar(50)
-  description String      @db.Text
-  price       Decimal     @db.Money
-  image       String      @db.Text
-  category    Category    @relation(fields: [categoryId], references: [id])
+  id          Int            @id @default(autoincrement())
+  name        String         @db.VarChar(50)
+  description String         @db.Text
+  price       Decimal        @db.Money
+  mainImage   String         @db.Text
+  Gallery     ProductImage[]
+  category    Category       @relation(fields: [categoryId], references: [id])
   categoryId  Int
-  discount    Discount?   @relation(fields: [discountId], references: [id])
+  discount    Discount?      @relation(fields: [discountId], references: [id])
   discountId  Int?
-  vendor      User        @relation(fields: [vendorId], references: [id])
+  vendor      User           @relation(fields: [vendorId], references: [id])
   vendorId    Int
   OrderItem   OrderItem[]
   Inventory   Inventory[]
   createdAt   DateTime
   updatedAt   DateTime
   CartItem    CartItem[]
+  Favourite   Favourite[]
 }
 
 model Category {
   id        Int       @id @default(autoincrement())
-  name      String    @db.VarChar(30)
+  name      String    @unique @db.VarChar(30)
   createdAt DateTime
   updatedAt DateTime
   Product   Product[]
+  owner     User      @relation(fields: [ownerId], references: [id])
+  ownerId   Int
 }
 
 model Discount {
@@ -100,6 +122,8 @@ model Discount {
   createdAt DateTime
   updatedAt DateTime
   Product   Product[]
+  vendor    User      @relation(fields: [vendorId], references: [id])
+  vendorId  Int
 }
 
 model Inventory {

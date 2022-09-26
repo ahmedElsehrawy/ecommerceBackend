@@ -4,6 +4,7 @@ import { createServer } from "http";
 import { createContext } from "./context";
 import { schema } from "./schema";
 import { ApolloServerPluginLandingPageLocalDefault } from "apollo-server-core";
+import cors from "cors";
 
 async function startApolloServer() {
   const app = express();
@@ -12,14 +13,25 @@ async function startApolloServer() {
   const apolloServer = new ApolloServer({
     schema: schema,
     csrfPrevention: true,
+    introspection: true,
     cache: "bounded",
     context: createContext,
     plugins: [ApolloServerPluginLandingPageLocalDefault],
   });
 
+  const corsOptions = {
+    origin: true,
+    credentials: true,
+  };
+
+  app.use(cors(corsOptions));
+
   await apolloServer.start();
 
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({
+    app,
+    cors: false,
+  });
 
   await new Promise<void>((resolve) => {
     httpServer.listen({ port: process.env.PORT || 4000 });

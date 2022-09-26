@@ -1,13 +1,19 @@
-import { inputObjectType } from "nexus";
-import { OrderStatus } from "../types";
+import { inputObjectType, list } from "nexus";
+
+export const cartItemInput = inputObjectType({
+  name: "cartItemInput",
+  definition(t) {
+    t.nonNull.int("productId");
+    t.nonNull.int("quantity");
+  },
+});
 
 export const createOrderInput = inputObjectType({
   name: "createOrderInput",
   definition(t) {
     t.nonNull.int("userId");
-    t.nonNull.float("totalPrice");
     t.nonNull.int("addressId");
-    t.nonNull.field("orderStatus", { type: OrderStatus });
+    t.nonNull.field({ name: "products", type: list(cartItemInput) });
   },
 });
 

@@ -31,6 +31,8 @@ type Category {
   createdAt: String!
   id: Int!
   name: String!
+  owner: User!
+  ownerId: Int!
   updatedAt: String!
 }
 
@@ -41,22 +43,46 @@ type Discount {
   name: String!
   percent: Int!
   updatedAt: String!
+  vendor: User!
+  vendorId: Int!
+}
+
+type Favourite {
+  id: Int!
+  product: Product!
+  user: User!
+}
+
+type Inventory {
+  color: String
+  id: Int!
+  product: Product!
+  productId: Int!
+  quantity: Int!
+  size: String
 }
 
 type Mutation {
+  AddAsFavourite(input: addToFavouriteInput!): Favourite!
   addCartItem(input: addCartItemInput!): CartItem!
   createAddress(input: createAddressInput!): Address!
   createCategory(input: createCategoryInput!): Category!
+  createDiscount(input: createDiscountInput!): Discount!
   createOrder(input: createOrderInput!): Order!
-  createOrderItem(input: createOrderItemInput!): orderItem!
   createProduct(input: createProductInput!): Product!
   deleteAddress(where: getUserWhereUniqueInput!): Address!
   deleteCategory(where: getOneCategoryWhereUniqueInput!): Category!
+  deleteDiscount(where: deleteDiscountWhereUniqeInput!): Discount!
   deleteOrder(where: getOrderInput!): Order!
   deleteProduct(where: getProductInput!): Product!
   deleteUser(where: UserWhereUniqueInput!): User!
+  login(input: loginInput!): User!
   register(input: createUserInput!): User!
   removeCartItem(where: removeCartItemWhereUniqueInput!): CartItem!
+  removeFromFavourites(where: removeFromFavouritesInput!): Favourite!
+  resetPassword(input: resetPaswwordInput!): User!
+  updateCategory(input: updateCategoryInput!, where: updateCategoryWhereUniqueInput!): Category!
+  updateDiscount(input: updateDiscountInput!, where: updateDiscountWhereUniqueInput!): Discount!
   updateProdcut(input: updateProdcutInput!, productId: updateProdcutWhereUniqueId!): Product!
 }
 
@@ -68,6 +94,7 @@ type Order {
   orderStatus: OrderStatus!
   totalPrice: Float!
   updatedAt: String!
+  user: User!
   userId: Int!
 }
 
@@ -79,33 +106,44 @@ enum OrderStatus {
 }
 
 type Product {
+  Gallery: [ProductImage!]!
   category: Category!
   categoryId: Int!
   createdAt: String!
   description: String!
   discountId: Int
   id: Int!
-  image: String!
+  inventory: [Inventory!]
+  mainImage: String!
   name: String!
   price: Float!
   updatedAt: String!
   vendorId: Int!
 }
 
+type ProductImage {
+  id: Int!
+  product: Product!
+  productId: Int!
+  url: String!
+}
+
 type Query {
-  createDiscount(input: createDiscountInput!): Discount!
-  getCart(where: getCartWhereUniqueInput!): Cart!
-  getCategories: [Category!]!
-  getManyOrders(where: getOrdersInput!): [Order!]!
+  categories(name: String, skip: Int!, take: Int!): categories!
+  discounts(skip: Int!, take: Int!): discounts!
+  getCart: Cart!
+  getDiscount(where: updateDiscountWhereUniqueInput!): Discount!
+  getFavourites: [Favourite!]!
   getOneAddress(where: getUserWhereUniqueInput!): Address!
   getOneCategory(where: getOneCategoryWhereUniqueInput!): Category!
   getOneOrder(where: getOrderInput!): Order!
   getOrderItems(where: getOrderItemsIdInput!): [orderItem!]!
-  getProduct(where: getProductInput!): Product!
-  getProductsByCategory(where: getProductsInput!): [Product!]!
   getUserAddresses(where: getUserAddressesInput!): [Address!]!
-  login(input: loginInput!): User!
+  orders(skip: Int!, take: Int!, where: getOrdersInput!): orders!
+  product(where: getProductInput!): Product!
+  products(skip: Int!, take: Int!, where: getProductsInput!): products!
   user: User!
+  vendorOrders(skip: Int!, take: Int!): vendorOrders!
 }
 
 enum Role {
@@ -135,9 +173,23 @@ input UserWhereUniqueInput {
 }
 
 input addCartItemInput {
-  cartId: Int!
   productId: Int!
   quantity: Int!
+}
+
+input addToFavouriteInput {
+  productId: Int!
+  userId: Int!
+}
+
+input cartItemInput {
+  productId: Int!
+  quantity: Int!
+}
+
+type categories {
+  count: Int!
+  nodes: [Category!]!
 }
 
 input createAddressInput {
@@ -162,22 +214,16 @@ input createDiscountInput {
 
 input createOrderInput {
   addressId: Int!
-  orderStatus: OrderStatus!
-  totalPrice: Float!
+  products: [cartItemInput]!
   userId: Int!
-}
-
-input createOrderItemInput {
-  orderId: Int
-  productId: Int
-  quantity: Int
 }
 
 input createProductInput {
   categoryId: Int!
   description: String!
   discountId: Int
-  image: String!
+  gallery: [productImage]
+  mainImage: String!
   name: String!
   price: Float!
 }
@@ -190,8 +236,13 @@ input createUserInput {
   phone: String!
 }
 
-input getCartWhereUniqueInput {
-  userId: Int!
+input deleteDiscountWhereUniqeInput {
+  id: Int!
+}
+
+type discounts {
+  count: Int!
+  nodes: [Discount!]!
 }
 
 input getOneCategoryWhereUniqueInput {
@@ -215,7 +266,9 @@ input getProductInput {
 }
 
 input getProductsInput {
-  categoryId: Int!
+  categoryId: Int
+  name: String
+  vendorId: Int
 }
 
 input getUserAddressesInput {
@@ -240,7 +293,48 @@ type orderItem {
   updatedAt: String!
 }
 
+type orders {
+  count: Int!
+  nodes: [Order!]!
+}
+
+input productImage {
+  url: String!
+}
+
+type products {
+  count: Int!
+  nodes: [Product!]!
+}
+
 input removeCartItemWhereUniqueInput {
+  id: Int!
+}
+
+input removeFromFavouritesInput {
+  productId: Int!
+}
+
+input resetPaswwordInput {
+  newPassword: String!
+  oldPassword: String!
+}
+
+input updateCategoryInput {
+  name: String!
+}
+
+input updateCategoryWhereUniqueInput {
+  id: Int!
+}
+
+input updateDiscountInput {
+  active: Boolean = false
+  name: String
+  percent: Int
+}
+
+input updateDiscountWhereUniqueInput {
   id: Int!
 }
 
@@ -255,4 +349,9 @@ input updateProdcutInput {
 
 input updateProdcutWhereUniqueId {
   id: Int!
+}
+
+type vendorOrders {
+  count: Int!
+  nodes: [Order!]!
 }

@@ -25,3 +25,10 @@ export const registerInput = inputObjectType({
     t.nonNull.string("phone");
   },
 });
+
+export const resetPaswwordInput = inputObjectType({
+  name: "resetPaswwordInput",
+  definition(t) {
+    t.nonNull.string("oldPassword"), t.nonNull.string("newPassword");
+  },
+});

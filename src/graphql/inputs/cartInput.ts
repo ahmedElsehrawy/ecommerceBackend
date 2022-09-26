@@ -10,7 +10,6 @@ export const getCartWhereUniqueInput = inputObjectType({
 export const addCartItemInput = inputObjectType({
   name: "addCartItemInput",
   definition(t) {
-    t.nonNull.int("cartId");
     t.nonNull.int("productId");
     t.nonNull.int("quantity");
   },

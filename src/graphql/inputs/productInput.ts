@@ -1,11 +1,19 @@
-import { inputObjectType } from "nexus";
+import { inputObjectType, list } from "nexus";
+
+export const productImage = inputObjectType({
+  name: "productImage",
+  definition(t) {
+    t.nonNull.string("url");
+  },
+});
 
 export const createProductInput = inputObjectType({
   name: "createProductInput",
   definition(t) {
     t.nonNull.string("name");
     t.nonNull.string("description");
-    t.nonNull.string("image");
+    t.nonNull.string("mainImage");
+    t.field({ name: "gallery", type: list(productImage) });
     t.nonNull.float("price");
     t.nonNull.int("categoryId");
     t.int("discountId");
@@ -41,6 +49,8 @@ export const getProductInput = inputObjectType({
 export const getProductsInput = inputObjectType({
   name: "getProductsInput",
   definition(t) {
-    t.nonNull.int("categoryId");
+    t.int("categoryId");
+    t.string("name");
+    t.int("vendorId");
   },
 });
