@@ -36,6 +36,17 @@ type Category {
   updatedAt: String!
 }
 
+type Comment {
+  commentOwnerId: Int!
+  commentText: String!
+  createdAt: String!
+  id: Int!
+  product: Product!
+  productId: Int!
+  updatedAt: String!
+  user: User!
+}
+
 type Discount {
   active: Boolean!
   createdAt: String!
@@ -67,9 +78,11 @@ type Mutation {
   addCartItem(input: addCartItemInput!): CartItem!
   createAddress(input: createAddressInput!): Address!
   createCategory(input: createCategoryInput!): Category!
+  createComment(input: createCommentInput!): Comment!
   createDiscount(input: createDiscountInput!): Discount!
   createOrder(input: createOrderInput!): Order!
   createProduct(input: createProductInput!): Product!
+  createRating(input: createRatingInput!): Rating!
   deleteAddress(where: getUserWhereUniqueInput!): Address!
   deleteCategory(where: getOneCategoryWhereUniqueInput!): Category!
   deleteDiscount(where: deleteDiscountWhereUniqeInput!): Discount!
@@ -106,14 +119,16 @@ enum OrderStatus {
 }
 
 type Product {
+  Comment: [Comment!]!
   Gallery: [ProductImage!]!
+  Inventory: [Inventory!]!
+  averageRatingValue: Int!
   category: Category!
   categoryId: Int!
   createdAt: String!
   description: String!
   discountId: Int
   id: Int!
-  inventory: [Inventory!]
   mainImage: String!
   name: String!
   price: Float!
@@ -130,8 +145,10 @@ type ProductImage {
 
 type Query {
   categories(name: String, skip: Int!, take: Int!): categories!
+  comment(where: getCommentInput!): Comment!
   discounts(skip: Int!, take: Int!): discounts!
   getCart: Cart!
+  getComments(where: getCommentsInput!): [Comment!]!
   getDiscount(where: updateDiscountWhereUniqueInput!): Discount!
   getFavourites: [Favourite!]!
   getOneAddress(where: getUserWhereUniqueInput!): Address!
@@ -146,6 +163,15 @@ type Query {
   vendorOrders(skip: Int!, take: Int!): vendorOrders!
 }
 
+type Rating {
+  id: Int!
+  product: Product!
+  productId: Int!
+  ratingValue: Int!
+  user: User!
+  userId: Int!
+}
+
 enum Role {
   CUSTOMER
   VENDOR
@@ -153,6 +179,7 @@ enum Role {
 
 type User {
   Address: [Address!]!
+  Comment: [Comment!]!
   Order: [Order!]!
   balance: Float!
   cart: Cart!
@@ -206,6 +233,12 @@ input createCategoryInput {
   name: String!
 }
 
+input createCommentInput {
+  commentOwnerId: Int!
+  commentText: String!
+  productId: Int!
+}
+
 input createDiscountInput {
   active: Boolean! = false
   name: String!
@@ -228,6 +261,12 @@ input createProductInput {
   price: Float!
 }
 
+input createRatingInput {
+  productId: Int!
+  ratingValue: Int!
+  userId: Int!
+}
+
 input createUserInput {
   email: String!
   firstName: String!
@@ -243,6 +282,14 @@ input deleteDiscountWhereUniqeInput {
 type discounts {
   count: Int!
   nodes: [Discount!]!
+}
+
+input getCommentInput {
+  commentId: ID!
+}
+
+input getCommentsInput {
+  productId: ID!
 }
 
 input getOneCategoryWhereUniqueInput {

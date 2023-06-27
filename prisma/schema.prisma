@@ -29,6 +29,8 @@ model User {
   Favourite Favourite[]
   Discount  Discount[]
   Category  Category[]
+  Comment   Comment[]
+  Rating    Rating[]
 }
 
 model Favourite {
@@ -84,24 +86,29 @@ model ProductImage {
 }
 
 model Product {
-  id          Int            @id @default(autoincrement())
-  name        String         @db.VarChar(50)
-  description String         @db.Text
-  price       Decimal        @db.Money
-  mainImage   String         @db.Text
-  Gallery     ProductImage[]
-  category    Category       @relation(fields: [categoryId], references: [id])
-  categoryId  Int
-  discount    Discount?      @relation(fields: [discountId], references: [id])
-  discountId  Int?
-  vendor      User           @relation(fields: [vendorId], references: [id])
-  vendorId    Int
-  OrderItem   OrderItem[]
-  Inventory   Inventory[]
-  createdAt   DateTime
-  updatedAt   DateTime
-  CartItem    CartItem[]
-  Favourite   Favourite[]
+  id                  Int            @id @default(autoincrement())
+  name                String         @db.VarChar(50)
+  description         String         @db.Text
+  price               Decimal        @db.Money
+  mainImage           String         @db.Text
+  Gallery             ProductImage[]
+  category            Category       @relation(fields: [categoryId], references: [id])
+  categoryId          Int
+  discount            Discount?      @relation(fields: [discountId], references: [id])
+  discountId          Int?
+  vendor              User           @relation(fields: [vendorId], references: [id])
+  vendorId            Int
+  OrderItem           OrderItem[]
+  Inventory           Inventory[]
+  createdAt           DateTime
+  updatedAt           DateTime
+  CartItem            CartItem[]
+  Favourite           Favourite[]
+  Comment             Comment[]
+  Rating              Rating[]
+  averageRatingValue  Int            @default(0)
+  totalRatingNetValue Int            @default(0)
+  ratingCounter       Int            @default(0)
 }
 
 model Category {
@@ -149,6 +156,26 @@ model CartItem {
   product   Product @relation(fields: [productId], references: [id])
   productId Int
   quantity  Int
+}
+
+model Comment {
+  id             Int      @id @default(autoincrement())
+  product        Product? @relation(fields: [productId], references: [id])
+  productId      Int?
+  user           User?    @relation(fields: [commentOwnerId], references: [id])
+  commentOwnerId Int?
+  commentText    String
+  createdAt      DateTime
+  updatedAt      DateTime
+}
+
+model Rating {
+  id          Int      @id @default(autoincrement())
+  product     Product? @relation(fields: [productId], references: [id])
+  productId   Int?
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      Int?
+  ratingValue Int
 }
 
 enum OrderStatus {

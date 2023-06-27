@@ -7,3 +7,5 @@ export * from "./category";
 export * from "./cart";
 export * from "./discount";
 export * from "./favourites";
+export * from "./comment";
+export * from "./raing";

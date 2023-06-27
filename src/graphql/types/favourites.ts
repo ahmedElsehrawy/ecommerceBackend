@@ -21,6 +21,7 @@ export const addAsFavourite = mutationField("AddAsFavourite", {
   args: {
     input: nonNull(addToFavouriteInput),
   },
+  //@ts-ignore
   resolve: async (_root, args, ctx) => {
     const user = await checkAuth(ctx);
 
@@ -55,6 +56,7 @@ export const removeFromFavourites = mutationField("removeFromFavourites", {
   args: {
     where: nonNull(removeFromFavouritesInput),
   },
+  //@ts-ignore
   resolve: async (_root, args, ctx) => {
     const auth = await checkAuth(ctx);
 
@@ -71,6 +73,7 @@ export const removeFromFavourites = mutationField("removeFromFavourites", {
     //@ts-ignore
     return ctx.prisma.favourite.delete({
       where: {
+        //@ts-ignore
         id: favourite.id,
       },
       include: {
@@ -83,6 +86,7 @@ export const removeFromFavourites = mutationField("removeFromFavourites", {
 
 export const getFavourites = queryField("getFavourites", {
   type: nonNull(list(Favourite)),
+  //@ts-ignore
   resolve: async (_root, _args, ctx) => {
     const auth = checkAuth(ctx);
     //@ts-ignore

@@ -44,6 +44,7 @@ export const createCategory = mutationField("createCategory", {
         ...args.input,
         createdAt: new Date(),
         updatedAt: new Date(),
+        //@ts-ignore
         ownerId: auth.id,
       },
     });

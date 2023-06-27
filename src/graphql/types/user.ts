@@ -18,6 +18,7 @@ import { Address } from "./address";
 import { Cart } from "./cart";
 import { Order } from "./order";
 import { checkAuth, generateToken } from "../../utils/auth";
+import { Comment } from "./comment";
 
 export const Role = enumType({
   name: "Role",
@@ -39,6 +40,7 @@ export const User = objectType({
     t.field("Address", { type: list(Address) });
     t.field("cart", { type: Cart });
     t.field("Order", { type: list(Order) });
+    t.field("Comment", { type: list(Comment) });
     t.string("createdAt");
     t.string("updatedAt");
   },

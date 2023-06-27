@@ -6,3 +6,5 @@ export * from "./productInput";
 export * from "./categoryInput";
 export * from "./cartInput";
 export * from "./discountInput";
+export * from "./commentInput";
+export * from "./ratingInput";

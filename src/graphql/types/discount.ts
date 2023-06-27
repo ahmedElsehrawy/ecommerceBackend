@@ -61,6 +61,7 @@ export const updateDiscount = mutationField("updateDiscount", {
       where: {
         id: args.where.id,
       },
+      //@ts-ignore
       data: {
         ...args.input,
       },

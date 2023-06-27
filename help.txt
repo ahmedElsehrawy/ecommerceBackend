@@ -1,0 +1,2 @@
+for new migration 
+    npx prisma migrate dev

@@ -18,6 +18,7 @@ import {
 } from "../inputs";
 import { Category } from "./category";
 import { Inventory } from "./inventory";
+import { Comment } from "./comment";
 
 export const ProductImage = objectType({
   name: "ProductImage",
@@ -39,12 +40,14 @@ export const Product = objectType({
     t.field("Gallery", { type: list(ProductImage) });
     t.int("categoryId");
     t.int("vendorId");
-    t.nullable.field("inventory", { type: list(Inventory) });
+    t.field("Inventory", { type: list(Inventory) });
     t.field("category", { type: Category });
     t.float("price");
+    t.int("averageRatingValue");
     t.nullable.int("discountId");
     t.string("createdAt");
     t.string("updatedAt");
+    t.field("Comment", { type: list(Comment) });
   },
 });
 
@@ -168,6 +171,12 @@ export const getProduct = queryField("product", {
         category: true,
         Inventory: true,
         Gallery: true,
+        //@ts-ignore
+        Comment: {
+          include: {
+            user: true,
+          },
+        },
       },
     });
 
@@ -185,9 +194,12 @@ export const getProduct = queryField("product", {
             (Number(product?.price) * discount.percent) / 100,
         };
       } else {
+        console.log(product);
+
         return product;
       }
     } else {
+      console.log(product);
       return product;
     }
   },
@@ -273,6 +285,13 @@ export const products = extendType({
             category: true,
             Inventory: true,
             Gallery: true,
+            //@ts-ignore
+            Comment: {
+              include: {
+                user: true,
+                product: true,
+              },
+            },
           },
         });
 

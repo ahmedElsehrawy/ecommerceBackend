@@ -41,6 +41,11 @@ export interface NexusGenInputs {
   createCategoryInput: { // input type
     name: string; // String!
   }
+  createCommentInput: { // input type
+    commentOwnerId: number; // Int!
+    commentText: string; // String!
+    productId: number; // Int!
+  }
   createDiscountInput: { // input type
     active: boolean; // Boolean!
     name: string; // String!
@@ -60,6 +65,11 @@ export interface NexusGenInputs {
     name: string; // String!
     price: number; // Float!
   }
+  createRatingInput: { // input type
+    productId: number; // Int!
+    ratingValue: number; // Int!
+    userId: number; // Int!
+  }
   createUserInput: { // input type
     email: string; // String!
     firstName: string; // String!
@@ -69,6 +79,12 @@ export interface NexusGenInputs {
   }
   deleteDiscountWhereUniqeInput: { // input type
     id: number; // Int!
+  }
+  getCommentInput: { // input type
+    commentId: string; // ID!
+  }
+  getCommentsInput: { // input type
+    productId: string; // ID!
   }
   getOneCategoryWhereUniqueInput: { // input type
     id: number; // Int!
@@ -184,6 +200,16 @@ export interface NexusGenObjects {
     ownerId: number; // Int!
     updatedAt: string; // String!
   }
+  Comment: { // root type
+    commentOwnerId: number; // Int!
+    commentText: string; // String!
+    createdAt: string; // String!
+    id: number; // Int!
+    product: NexusGenRootTypes['Product']; // Product!
+    productId: number; // Int!
+    updatedAt: string; // String!
+    user: NexusGenRootTypes['User']; // User!
+  }
   Discount: { // root type
     active: boolean; // Boolean!
     createdAt: string; // String!
@@ -220,14 +246,16 @@ export interface NexusGenObjects {
     userId: number; // Int!
   }
   Product: { // root type
+    Comment: NexusGenRootTypes['Comment'][]; // [Comment!]!
     Gallery: NexusGenRootTypes['ProductImage'][]; // [ProductImage!]!
+    Inventory: NexusGenRootTypes['Inventory'][]; // [Inventory!]!
+    averageRatingValue: number; // Int!
     category: NexusGenRootTypes['Category']; // Category!
     categoryId: number; // Int!
     createdAt: string; // String!
     description: string; // String!
     discountId?: number | null; // Int
     id: number; // Int!
-    inventory?: NexusGenRootTypes['Inventory'][] | null; // [Inventory!]
     mainImage: string; // String!
     name: string; // String!
     price: number; // Float!
@@ -241,8 +269,17 @@ export interface NexusGenObjects {
     url: string; // String!
   }
   Query: {};
+  Rating: { // root type
+    id: number; // Int!
+    product: NexusGenRootTypes['Product']; // Product!
+    productId: number; // Int!
+    ratingValue: number; // Int!
+    user: NexusGenRootTypes['User']; // User!
+    userId: number; // Int!
+  }
   User: { // root type
     Address: NexusGenRootTypes['Address'][]; // [Address!]!
+    Comment: NexusGenRootTypes['Comment'][]; // [Comment!]!
     Order: NexusGenRootTypes['Order'][]; // [Order!]!
     balance: number; // Float!
     cart: NexusGenRootTypes['Cart']; // Cart!
@@ -328,6 +365,16 @@ export interface NexusGenFieldTypes {
     ownerId: number; // Int!
     updatedAt: string; // String!
   }
+  Comment: { // field return type
+    commentOwnerId: number; // Int!
+    commentText: string; // String!
+    createdAt: string; // String!
+    id: number; // Int!
+    product: NexusGenRootTypes['Product']; // Product!
+    productId: number; // Int!
+    updatedAt: string; // String!
+    user: NexusGenRootTypes['User']; // User!
+  }
   Discount: { // field return type
     active: boolean; // Boolean!
     createdAt: string; // String!
@@ -356,9 +403,11 @@ export interface NexusGenFieldTypes {
     addCartItem: NexusGenRootTypes['CartItem']; // CartItem!
     createAddress: NexusGenRootTypes['Address']; // Address!
     createCategory: NexusGenRootTypes['Category']; // Category!
+    createComment: NexusGenRootTypes['Comment']; // Comment!
     createDiscount: NexusGenRootTypes['Discount']; // Discount!
     createOrder: NexusGenRootTypes['Order']; // Order!
     createProduct: NexusGenRootTypes['Product']; // Product!
+    createRating: NexusGenRootTypes['Rating']; // Rating!
     deleteAddress: NexusGenRootTypes['Address']; // Address!
     deleteCategory: NexusGenRootTypes['Category']; // Category!
     deleteDiscount: NexusGenRootTypes['Discount']; // Discount!
@@ -386,14 +435,16 @@ export interface NexusGenFieldTypes {
     userId: number; // Int!
   }
   Product: { // field return type
+    Comment: NexusGenRootTypes['Comment'][]; // [Comment!]!
     Gallery: NexusGenRootTypes['ProductImage'][]; // [ProductImage!]!
+    Inventory: NexusGenRootTypes['Inventory'][]; // [Inventory!]!
+    averageRatingValue: number; // Int!
     category: NexusGenRootTypes['Category']; // Category!
     categoryId: number; // Int!
     createdAt: string; // String!
     description: string; // String!
     discountId: number | null; // Int
     id: number; // Int!
-    inventory: NexusGenRootTypes['Inventory'][] | null; // [Inventory!]
     mainImage: string; // String!
     name: string; // String!
     price: number; // Float!
@@ -408,8 +459,10 @@ export interface NexusGenFieldTypes {
   }
   Query: { // field return type
     categories: NexusGenRootTypes['categories']; // categories!
+    comment: NexusGenRootTypes['Comment']; // Comment!
     discounts: NexusGenRootTypes['discounts']; // discounts!
     getCart: NexusGenRootTypes['Cart']; // Cart!
+    getComments: NexusGenRootTypes['Comment'][]; // [Comment!]!
     getDiscount: NexusGenRootTypes['Discount']; // Discount!
     getFavourites: NexusGenRootTypes['Favourite'][]; // [Favourite!]!
     getOneAddress: NexusGenRootTypes['Address']; // Address!
@@ -423,8 +476,17 @@ export interface NexusGenFieldTypes {
     user: NexusGenRootTypes['User']; // User!
     vendorOrders: NexusGenRootTypes['vendorOrders']; // vendorOrders!
   }
+  Rating: { // field return type
+    id: number; // Int!
+    product: NexusGenRootTypes['Product']; // Product!
+    productId: number; // Int!
+    ratingValue: number; // Int!
+    user: NexusGenRootTypes['User']; // User!
+    userId: number; // Int!
+  }
   User: { // field return type
     Address: NexusGenRootTypes['Address'][]; // [Address!]!
+    Comment: NexusGenRootTypes['Comment'][]; // [Comment!]!
     Order: NexusGenRootTypes['Order'][]; // [Order!]!
     balance: number; // Float!
     cart: NexusGenRootTypes['Cart']; // Cart!
@@ -500,6 +562,16 @@ export interface NexusGenFieldTypeNames {
     ownerId: 'Int'
     updatedAt: 'String'
   }
+  Comment: { // field return type name
+    commentOwnerId: 'Int'
+    commentText: 'String'
+    createdAt: 'String'
+    id: 'Int'
+    product: 'Product'
+    productId: 'Int'
+    updatedAt: 'String'
+    user: 'User'
+  }
   Discount: { // field return type name
     active: 'Boolean'
     createdAt: 'String'
@@ -528,9 +600,11 @@ export interface NexusGenFieldTypeNames {
     addCartItem: 'CartItem'
     createAddress: 'Address'
     createCategory: 'Category'
+    createComment: 'Comment'
     createDiscount: 'Discount'
     createOrder: 'Order'
     createProduct: 'Product'
+    createRating: 'Rating'
     deleteAddress: 'Address'
     deleteCategory: 'Category'
     deleteDiscount: 'Discount'
@@ -558,14 +632,16 @@ export interface NexusGenFieldTypeNames {
     userId: 'Int'
   }
   Product: { // field return type name
+    Comment: 'Comment'
     Gallery: 'ProductImage'
+    Inventory: 'Inventory'
+    averageRatingValue: 'Int'
     category: 'Category'
     categoryId: 'Int'
     createdAt: 'String'
     description: 'String'
     discountId: 'Int'
     id: 'Int'
-    inventory: 'Inventory'
     mainImage: 'String'
     name: 'String'
     price: 'Float'
@@ -580,8 +656,10 @@ export interface NexusGenFieldTypeNames {
   }
   Query: { // field return type name
     categories: 'categories'
+    comment: 'Comment'
     discounts: 'discounts'
     getCart: 'Cart'
+    getComments: 'Comment'
     getDiscount: 'Discount'
     getFavourites: 'Favourite'
     getOneAddress: 'Address'
@@ -595,8 +673,17 @@ export interface NexusGenFieldTypeNames {
     user: 'User'
     vendorOrders: 'vendorOrders'
   }
+  Rating: { // field return type name
+    id: 'Int'
+    product: 'Product'
+    productId: 'Int'
+    ratingValue: 'Int'
+    user: 'User'
+    userId: 'Int'
+  }
   User: { // field return type name
     Address: 'Address'
+    Comment: 'Comment'
     Order: 'Order'
     balance: 'Float'
     cart: 'Cart'
@@ -655,6 +742,9 @@ export interface NexusGenArgTypes {
     createCategory: { // args
       input: NexusGenInputs['createCategoryInput']; // createCategoryInput!
     }
+    createComment: { // args
+      input: NexusGenInputs['createCommentInput']; // createCommentInput!
+    }
     createDiscount: { // args
       input: NexusGenInputs['createDiscountInput']; // createDiscountInput!
     }
@@ -663,6 +753,9 @@ export interface NexusGenArgTypes {
     }
     createProduct: { // args
       input: NexusGenInputs['createProductInput']; // createProductInput!
+    }
+    createRating: { // args
+      input: NexusGenInputs['createRatingInput']; // createRatingInput!
     }
     deleteAddress: { // args
       where: NexusGenInputs['getUserWhereUniqueInput']; // getUserWhereUniqueInput!
@@ -716,9 +809,15 @@ export interface NexusGenArgTypes {
       skip: number; // Int!
       take: number; // Int!
     }
+    comment: { // args
+      where: NexusGenInputs['getCommentInput']; // getCommentInput!
+    }
     discounts: { // args
       skip: number; // Int!
       take: number; // Int!
+    }
+    getComments: { // args
+      where: NexusGenInputs['getCommentsInput']; // getCommentsInput!
     }
     getDiscount: { // args
       where: NexusGenInputs['updateDiscountWhereUniqueInput']; // updateDiscountWhereUniqueInput!
