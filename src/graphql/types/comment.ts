@@ -26,6 +26,7 @@ export const createComment = mutationField("createComment", {
   args: {
     input: nonNull(createCommentInput),
   },
+  //@ts-ignore
   resolve: async (_root, args, ctx) => {
     //@ts-ignore
     return ctx.prisma.comment.create({
@@ -46,6 +47,7 @@ export const getComment = queryField("comment", {
   args: {
     where: nonNull(getCommentInput),
   },
+  //@ts-ignore
   resolve: async (_root, args, ctx) => {
     //@ts-ignore
     const comment = await ctx.prisma.comment.findUnique({
@@ -69,6 +71,7 @@ export const getComments = queryField("getComments", {
   args: {
     where: nonNull(getCommentsInput),
   },
+  //@ts-ignore
   resolve: async (_root, args, ctx) => {
     //@ts-ignore
     const comments = await ctx.prisma.comment.findMany({

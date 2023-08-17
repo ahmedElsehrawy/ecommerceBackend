@@ -87,14 +87,19 @@ export const deleteAddress = mutationField("deleteAddress", {
         id: args.where.id,
       },
     });
+
     //@ts-ignore
-    if (address?.userId !== user?.id) {
-      throw new Error("not allowed to do that");
+    if (address?.userId != user?.id) {
+      throw new Error("not allowed to do that, ");
     }
-    return ctx.prisma.address.delete({
-      where: {
-        id: args.where.id,
-      },
-    });
+    return ctx.prisma.address
+      .delete({
+        where: {
+          id: args.where.id,
+        },
+      })
+      .catch(() => {
+        throw new Error("sorry this address is being used");
+      });
   },
 });
