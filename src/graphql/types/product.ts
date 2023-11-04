@@ -63,7 +63,7 @@ export const createProduct = mutationField("createProduct", {
     if (!user) {
       throw new Error("not authenticated");
     }
-    console.log("🚀 ~ file: product.ts ~ line 52 ~ resolve: ~ user", user);
+    console.log("🚀 ~ file: product.ts ~ line 66 ", user);
 
     //@ts-ignore
     if (user.role !== "VENDOR") {
@@ -295,7 +295,18 @@ export const products = extendType({
           },
         });
 
-        let count = await ctx.prisma.product.count({});
+        let count = await ctx.prisma.product.count({
+          where: {
+            OR: [
+              //@ts-ignore
+              { categoryId: args.where.categoryId },
+              //@ts-ignore
+              { name: { contains: args.where.name } },
+              //@ts-ignore
+              { vendorId: args.where.vendorId },
+            ],
+          },
+        });
 
         let customizedNodes: any = nodes.map((node: any) => {
           return {

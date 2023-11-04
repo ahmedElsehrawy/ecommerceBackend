@@ -13,8 +13,10 @@ export const checkAuth = (context: any) => {
   if (authHeader) {
     const token = authHeader.split(" ")[1];
     if (token) {
+      console.log("🚀 ~ file: auth.ts:16 ~ checkAuth ~ token:", token);
       try {
         const user = jwt.verify(token, SECRET_KEY);
+        console.log("🚀 ~ file: auth.ts:18 ~ checkAuth ~ user:", user);
         return user;
       } catch (error) {
         throw new Error("Invalid/Expire token");
