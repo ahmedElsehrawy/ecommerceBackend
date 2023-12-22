@@ -33,6 +33,7 @@ type Category {
   name: String!
   owner: User!
   ownerId: Int!
+  product: [Product!]!
   updatedAt: String!
 }
 

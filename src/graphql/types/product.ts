@@ -15,6 +15,7 @@ import {
   getProductsInput,
   updateProdcutInput,
   updateProdcutWhereUniqueId,
+  getOneProductInput,
 } from "../inputs";
 import { Category } from "./category";
 import { Inventory } from "./inventory";

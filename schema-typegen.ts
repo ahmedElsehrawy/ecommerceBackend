@@ -198,6 +198,7 @@ export interface NexusGenObjects {
     name: string; // String!
     owner: NexusGenRootTypes['User']; // User!
     ownerId: number; // Int!
+    product: NexusGenRootTypes['Product'][]; // [Product!]!
     updatedAt: string; // String!
   }
   Comment: { // root type
@@ -363,6 +364,7 @@ export interface NexusGenFieldTypes {
     name: string; // String!
     owner: NexusGenRootTypes['User']; // User!
     ownerId: number; // Int!
+    product: NexusGenRootTypes['Product'][]; // [Product!]!
     updatedAt: string; // String!
   }
   Comment: { // field return type
@@ -560,6 +562,7 @@ export interface NexusGenFieldTypeNames {
     name: 'String'
     owner: 'User'
     ownerId: 'Int'
+    product: 'Product'
     updatedAt: 'String'
   }
   Comment: { // field return type name

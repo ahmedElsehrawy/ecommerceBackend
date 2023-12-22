@@ -1,6 +1,7 @@
 import {
   extendType,
   intArg,
+  list,
   mutationField,
   nonNull,
   objectType,
@@ -17,6 +18,7 @@ import {
   updateCategoryWhereUniqueInput,
 } from "../inputs";
 import { User } from "./user";
+import { Product } from "./product";
 
 export const Category = objectType({
   name: "Category",
@@ -27,6 +29,7 @@ export const Category = objectType({
     t.string("updatedAt");
     t.int("ownerId");
     t.field("owner", { type: nonNull(User) });
+    t.field("product", { type: list(nonNull(Product)) });
   },
 });
 

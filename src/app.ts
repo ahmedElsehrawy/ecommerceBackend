@@ -24,6 +24,8 @@ async function startApolloServer() {
     credentials: true,
   };
 
+  const PORT = process.env.PORT || 4000;
+
   app.use(cors(corsOptions));
 
   await apolloServer.start();
@@ -34,7 +36,7 @@ async function startApolloServer() {
   });
 
   await new Promise<void>((resolve) => {
-    httpServer.listen({ port: process.env.PORT || 4000 });
+    httpServer.listen({ port: PORT });
     resolve();
   });
 
