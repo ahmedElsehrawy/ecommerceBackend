@@ -92,9 +92,10 @@ type Mutation {
   deleteUser(where: UserWhereUniqueInput!): User!
   login(input: loginInput!): User!
   register(input: createUserInput!): User!
-  removeCartItem(where: removeCartItemWhereUniqueInput!): CartItem!
+  removeCartItem(where: removeCartItemWhereUniqueInput!): Cart!
   removeFromFavourites(where: removeFromFavouritesInput!): Favourite!
   resetPassword(input: resetPaswwordInput!): User!
+  updateCartItem(input: updateCartItemUniqueInput!, where: updateCartItemWhereUniqueInput!): CartItem!
   updateCategory(input: updateCategoryInput!, where: updateCategoryWhereUniqueInput!): Category!
   updateDiscount(input: updateDiscountInput!, where: updateDiscountWhereUniqueInput!): Discount!
   updateProdcut(input: updateProdcutInput!, productId: updateProdcutWhereUniqueId!): Product!
@@ -159,7 +160,7 @@ type Query {
   getUserAddresses(where: getUserAddressesInput!): [Address!]!
   orders(skip: Int!, take: Int!, where: getOrdersInput!): orders!
   product(where: getProductInput!): Product!
-  products(skip: Int!, take: Int!, where: getProductsInput!): products!
+  products(orderBy: getProductsOrderBy, skip: Int!, take: Int!, where: getProductsInput!): products!
   user: User!
   vendorOrders(skip: Int!, take: Int!): vendorOrders!
 }
@@ -207,7 +208,6 @@ input addCartItemInput {
 
 input addToFavouriteInput {
   productId: Int!
-  userId: Int!
 }
 
 input cartItemInput {
@@ -319,6 +319,11 @@ input getProductsInput {
   vendorId: Int
 }
 
+input getProductsOrderBy {
+  createdAt: String
+  price: String
+}
+
 input getUserAddressesInput {
   userId: Int!
 }
@@ -366,6 +371,14 @@ input removeFromFavouritesInput {
 input resetPaswwordInput {
   newPassword: String!
   oldPassword: String!
+}
+
+input updateCartItemUniqueInput {
+  quantity: Int!
+}
+
+input updateCartItemWhereUniqueInput {
+  id: Int!
 }
 
 input updateCategoryInput {

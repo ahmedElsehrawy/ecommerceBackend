@@ -21,3 +21,17 @@ export const removeCartItemWhereUniqueInput = inputObjectType({
     t.nonNull.int("id");
   },
 });
+
+export const updateCartItemUniqueInput = inputObjectType({
+  name: "updateCartItemUniqueInput",
+  definition(t) {
+    t.nonNull.int("quantity");
+  },
+});
+
+export const updateCartItemWhereUniqueInput = inputObjectType({
+  name: "updateCartItemWhereUniqueInput",
+  definition(t) {
+    t.nonNull.int("id");
+  },
+});

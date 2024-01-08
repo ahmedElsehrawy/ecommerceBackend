@@ -23,7 +23,6 @@ export interface NexusGenInputs {
   }
   addToFavouriteInput: { // input type
     productId: number; // Int!
-    userId: number; // Int!
   }
   cartItemInput: { // input type
     productId: number; // Int!
@@ -106,6 +105,10 @@ export interface NexusGenInputs {
     name?: string | null; // String
     vendorId?: number | null; // Int
   }
+  getProductsOrderBy: { // input type
+    createdAt?: string | null; // String
+    price?: string | null; // String
+  }
   getUserAddressesInput: { // input type
     userId: number; // Int!
   }
@@ -128,6 +131,12 @@ export interface NexusGenInputs {
   resetPaswwordInput: { // input type
     newPassword: string; // String!
     oldPassword: string; // String!
+  }
+  updateCartItemUniqueInput: { // input type
+    quantity: number; // Int!
+  }
+  updateCartItemWhereUniqueInput: { // input type
+    id: number; // Int!
   }
   updateCategoryInput: { // input type
     name: string; // String!
@@ -418,9 +427,10 @@ export interface NexusGenFieldTypes {
     deleteUser: NexusGenRootTypes['User']; // User!
     login: NexusGenRootTypes['User']; // User!
     register: NexusGenRootTypes['User']; // User!
-    removeCartItem: NexusGenRootTypes['CartItem']; // CartItem!
+    removeCartItem: NexusGenRootTypes['Cart']; // Cart!
     removeFromFavourites: NexusGenRootTypes['Favourite']; // Favourite!
     resetPassword: NexusGenRootTypes['User']; // User!
+    updateCartItem: NexusGenRootTypes['CartItem']; // CartItem!
     updateCategory: NexusGenRootTypes['Category']; // Category!
     updateDiscount: NexusGenRootTypes['Discount']; // Discount!
     updateProdcut: NexusGenRootTypes['Product']; // Product!
@@ -616,9 +626,10 @@ export interface NexusGenFieldTypeNames {
     deleteUser: 'User'
     login: 'User'
     register: 'User'
-    removeCartItem: 'CartItem'
+    removeCartItem: 'Cart'
     removeFromFavourites: 'Favourite'
     resetPassword: 'User'
+    updateCartItem: 'CartItem'
     updateCategory: 'Category'
     updateDiscount: 'Discount'
     updateProdcut: 'Product'
@@ -793,6 +804,10 @@ export interface NexusGenArgTypes {
     resetPassword: { // args
       input: NexusGenInputs['resetPaswwordInput']; // resetPaswwordInput!
     }
+    updateCartItem: { // args
+      input: NexusGenInputs['updateCartItemUniqueInput']; // updateCartItemUniqueInput!
+      where: NexusGenInputs['updateCartItemWhereUniqueInput']; // updateCartItemWhereUniqueInput!
+    }
     updateCategory: { // args
       input: NexusGenInputs['updateCategoryInput']; // updateCategoryInput!
       where: NexusGenInputs['updateCategoryWhereUniqueInput']; // updateCategoryWhereUniqueInput!
@@ -849,6 +864,7 @@ export interface NexusGenArgTypes {
       where: NexusGenInputs['getProductInput']; // getProductInput!
     }
     products: { // args
+      orderBy?: NexusGenInputs['getProductsOrderBy'] | null; // getProductsOrderBy
       skip: number; // Int!
       take: number; // Int!
       where: NexusGenInputs['getProductsInput']; // getProductsInput!

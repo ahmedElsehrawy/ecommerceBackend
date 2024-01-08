@@ -54,3 +54,11 @@ export const getProductsInput = inputObjectType({
     t.int("vendorId");
   },
 });
+
+export const getProductsOrderBy = inputObjectType({
+  name: "getProductsOrderBy",
+  definition(t) {
+    t.string("price");
+    t.string("createdAt");
+  },
+});

@@ -41,6 +41,7 @@ export const addAsFavourite = mutationField("AddAsFavourite", {
     //@ts-ignore
     return ctx.prisma.favourite.create({
       data: {
+        userId: user.id,
         ...args.input,
       },
       include: {

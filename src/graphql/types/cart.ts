@@ -10,6 +10,8 @@ import { checkAuth } from "../../utils/auth";
 import {
   addCartItemInput,
   removeCartItemWhereUniqueInput,
+  updateCartItemUniqueInput,
+  updateCartItemWhereUniqueInput,
 } from "../inputs/cartInput";
 import { Product } from "./product";
 
@@ -96,18 +98,42 @@ export const addCartItem = mutationField("addCartItem", {
   },
 });
 
-export const removeCartItem = mutationField("removeCartItem", {
+export const updateCartItem = mutationField("updateCartItem", {
   type: nonNull(CartItem),
+  args: {
+    input: nonNull(updateCartItemUniqueInput),
+    where: nonNull(updateCartItemWhereUniqueInput),
+  },
+  //@ts-ignore
+  resolve: async (_root, args, ctx) => {
+    return ctx.prisma.cartItem.update({
+      where: {
+        id: args.where?.id,
+      },
+      data: {
+        quantity: args?.input?.quantity,
+      },
+    });
+  },
+});
+
+export const removeCartItem = mutationField("removeCartItem", {
+  type: nonNull(Cart),
   args: {
     where: nonNull(removeCartItemWhereUniqueInput),
   },
   //@ts-ignore
-  resolve: async (_root, args, ctx) => {
-    return ctx.prisma.cartItem.delete({
-      where: {
-        id: args.where.id,
-      },
-    });
+  resolve: async (root, args, ctx) => {
+    try {
+      await ctx.prisma.cartItem.delete({
+        where: {
+          id: args.where.id,
+        },
+      });
+    } catch (error) {
+      throw new Error("oppps something happened");
+    }
+    return cartFunctionCalculator(root, args, ctx);
   },
 });
 
@@ -131,6 +157,9 @@ export const cartFunctionCalculator = async (
   const cartItems = await ctx.prisma.cartItem.findMany({
     where: {
       cartId: cart?.id,
+    },
+    orderBy: {
+      id: "asc",
     },
     include: {
       product: true,

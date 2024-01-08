@@ -1,9 +1,11 @@
 import {
+  arg,
   extendType,
   intArg,
   list,
   mutationField,
   nonNull,
+  nullable,
   objectType,
   queryField,
 } from "nexus";
@@ -16,6 +18,7 @@ import {
   updateProdcutInput,
   updateProdcutWhereUniqueId,
   getOneProductInput,
+  getProductsOrderBy,
 } from "../inputs";
 import { Category } from "./category";
 import { Inventory } from "./inventory";
@@ -266,21 +269,45 @@ export const products = extendType({
         skip: nonNull(intArg()),
         take: nonNull(intArg()),
         where: nonNull(getProductsInput),
+        orderBy: nullable(getProductsOrderBy),
+        //orderBy: arg({ type: "PostOrderByPrice" }),
       },
       //@ts-ignore
       resolve: async (_root, args, ctx) => {
-        let nodes = await ctx.prisma.product.findMany({
+        let filter: any = {
           skip: args.skip,
           take: args.take,
-          where: {
-            OR: [
-              //@ts-ignore
-              { categoryId: args.where.categoryId },
-              //@ts-ignore
-              { name: { contains: args.where.name } },
-              //@ts-ignore
-              { vendorId: args.where.vendorId },
-            ],
+        };
+        if (
+          args.where?.categoryId ||
+          args.where?.name ||
+          args.where?.vendorId
+        ) {
+          filter = {
+            skip: args.skip,
+            take: args.take,
+            where: {
+              OR: [
+                //@ts-ignore
+                { categoryId: args.where.categoryId },
+                //@ts-ignore
+                {
+                  name: {
+                    contains: args.where.name?.toLowerCase(),
+                    mode: "insensitive",
+                  },
+                },
+                //@ts-ignore
+                { vendorId: args.where.vendorId },
+              ],
+            },
+          };
+        }
+        let nodes = await ctx.prisma.product.findMany({
+          ...filter,
+          orderBy: {
+            price: args.orderBy?.price,
+            createdAt: args?.orderBy?.createdAt,
           },
           include: {
             category: true,
@@ -296,18 +323,24 @@ export const products = extendType({
           },
         });
 
-        let count = await ctx.prisma.product.count({
-          where: {
-            OR: [
-              //@ts-ignore
-              { categoryId: args.where.categoryId },
-              //@ts-ignore
-              { name: { contains: args.where.name } },
-              //@ts-ignore
-              { vendorId: args.where.vendorId },
-            ],
-          },
-        });
+        let getCountFilter = {};
+
+        if (args.where?.categoryId) {
+          getCountFilter = {
+            where: {
+              OR: [
+                //@ts-ignore
+                { categoryId: args.where.categoryId },
+                //@ts-ignore
+                { name: { contains: args.where.name } },
+                //@ts-ignore
+                { vendorId: args.where.vendorId },
+              ],
+            },
+          };
+        }
+
+        let count = await ctx.prisma.product.count({ ...getCountFilter });
 
         let customizedNodes: any = nodes.map((node: any) => {
           return {

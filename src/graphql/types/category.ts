@@ -40,23 +40,28 @@ export const createCategory = mutationField("createCategory", {
   },
   //@ts-ignore
   resolve: async (_root, args, ctx) => {
+    //@ts-ignore
     let auth = checkAuth(ctx);
 
-    let category = await ctx.prisma.category.create({
-      data: {
-        ...args.input,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        //@ts-ignore
-        ownerId: auth.id,
-      },
-    });
+    try {
+      let category = await ctx.prisma.category.create({
+        data: {
+          ...args.input,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          //@ts-ignore
+          ownerId: auth.id,
+        },
+      });
 
-    if (!category) {
-      throw new Error("category Alreay exist");
+      if (!category) {
+        throw new Error("category Alreay exist");
+      }
+
+      return category;
+    } catch (error: any) {
+      throw new Error(error);
     }
-
-    return category;
   },
 });
 
