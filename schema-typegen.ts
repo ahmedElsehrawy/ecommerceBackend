@@ -102,6 +102,8 @@ export interface NexusGenInputs {
   }
   getProductsInput: { // input type
     categoryId?: number | null; // Int
+    maxSalary?: number | null; // Float
+    minSalary?: number | null; // Float
     name?: string | null; // String
     vendorId?: number | null; // Int
   }

@@ -199,6 +199,11 @@ export const login = mutationField("login", {
     });
     console.log("🚀 ~ file: user.ts ~ line 192 ~ resolve: ~ user", user);
 
+    //@ts-ignore
+    ctx?.res?.cookie("token", JSON.stringify(token), {
+      maxAge: 60 * 60 * 24 * 30 * 1000,
+      httpOnly: true,
+    });
     return user;
   },
 });

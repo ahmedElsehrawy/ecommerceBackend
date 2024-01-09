@@ -283,10 +283,33 @@ export const products = extendType({
           args.where?.name ||
           args.where?.vendorId
         ) {
+          let priceFilter = {};
+          if (args?.where?.maxSalary && !args?.where?.minSalary) {
+            priceFilter = {
+              price: {
+                lte: args?.where?.maxSalary,
+              },
+            };
+          } else if (!args?.where?.maxSalary && args?.where?.minSalary) {
+            priceFilter = {
+              price: {
+                gte: args?.where?.minSalary,
+              },
+            };
+          } else if (args?.where?.maxSalary && args?.where?.minSalary) {
+            priceFilter = {
+              price: {
+                gte: args?.where?.minSalary,
+                lte: args?.where?.maxSalary,
+              },
+            };
+          }
+
           filter = {
             skip: args.skip,
             take: args.take,
             where: {
+              ...priceFilter,
               OR: [
                 //@ts-ignore
                 { categoryId: args.where.categoryId },

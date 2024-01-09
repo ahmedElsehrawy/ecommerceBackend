@@ -315,6 +315,8 @@ input getProductInput {
 
 input getProductsInput {
   categoryId: Int
+  maxSalary: Float
+  minSalary: Float
   name: String
   vendorId: Int
 }

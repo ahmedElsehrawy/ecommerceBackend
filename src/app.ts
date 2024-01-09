@@ -5,10 +5,15 @@ import { createContext } from "./context";
 import { schema } from "./schema";
 import { ApolloServerPluginLandingPageLocalDefault } from "apollo-server-core";
 import cors from "cors";
+//@ts-ignore
+import cookieParser from "cookie-parser";
 
 async function startApolloServer() {
   const app = express();
   const httpServer = createServer(app);
+
+  // Use cookie-parser middleware
+  app.use(cookieParser());
 
   const apolloServer = new ApolloServer({
     schema: schema,

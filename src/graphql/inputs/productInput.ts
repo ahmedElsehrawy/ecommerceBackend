@@ -52,6 +52,8 @@ export const getProductsInput = inputObjectType({
     t.int("categoryId");
     t.string("name");
     t.int("vendorId");
+    t.float("maxSalary");
+    t.float("minSalary");
   },
 });
 
