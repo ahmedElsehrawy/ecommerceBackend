@@ -28,6 +28,7 @@ type CartItem {
 }
 
 type Category {
+  SubCategory: [SubCategory!]!
   createdAt: String!
   id: Int!
   name: String!
@@ -84,6 +85,7 @@ type Mutation {
   createOrder(input: createOrderInput!): Order!
   createProduct(input: createProductInput!): Product!
   createRating(input: createRatingInput!): Rating!
+  createSubCategory(input: createSubCategoryInput!): SubCategory!
   deleteAddress(where: getUserWhereUniqueInput!): Address!
   deleteCategory(where: getOneCategoryWhereUniqueInput!): Category!
   deleteDiscount(where: deleteDiscountWhereUniqeInput!): Discount!
@@ -134,6 +136,8 @@ type Product {
   mainImage: String!
   name: String!
   price: Float!
+  subCategory: SubCategory!
+  subCategoryId: Int!
   updatedAt: String!
   vendorId: Int!
 }
@@ -156,7 +160,9 @@ type Query {
   getOneAddress(where: getUserWhereUniqueInput!): Address!
   getOneCategory(where: getOneCategoryWhereUniqueInput!): Category!
   getOneOrder(where: getOrderInput!): Order!
+  getOneSubCategory(where: getOneSubCategoryWhereUniqueInput!): SubCategory!
   getOrderItems(where: getOrderItemsIdInput!): [orderItem!]!
+  getSubCategories(where: getSubCategoriesWhereUniqueInput!): [SubCategory!]!
   getUserAddresses(where: getUserAddressesInput!): [Address!]!
   orders(skip: Int!, take: Int!, where: getOrdersInput!): orders!
   product(where: getProductInput!): Product!
@@ -177,6 +183,13 @@ type Rating {
 enum Role {
   CUSTOMER
   VENDOR
+}
+
+type SubCategory {
+  category: Category!
+  categoryId: Int!
+  id: Int!
+  name: String!
 }
 
 type User {
@@ -260,12 +273,18 @@ input createProductInput {
   mainImage: String!
   name: String!
   price: Float!
+  subCategoryId: Int!
 }
 
 input createRatingInput {
   productId: Int!
   ratingValue: Int!
   userId: Int!
+}
+
+input createSubCategoryInput {
+  categoryId: Int!
+  name: String!
 }
 
 input createUserInput {
@@ -297,6 +316,10 @@ input getOneCategoryWhereUniqueInput {
   id: Int!
 }
 
+input getOneSubCategoryWhereUniqueInput {
+  id: Int!
+}
+
 input getOrderInput {
   id: Int!
 }
@@ -318,12 +341,17 @@ input getProductsInput {
   maxSalary: Float
   minSalary: Float
   name: String
+  subCategoryId: Int
   vendorId: Int
 }
 
 input getProductsOrderBy {
   createdAt: String
   price: String
+}
+
+input getSubCategoriesWhereUniqueInput {
+  categoryId: Int!
 }
 
 input getUserAddressesInput {

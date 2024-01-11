@@ -17,6 +17,7 @@ export const createProductInput = inputObjectType({
     t.nonNull.float("price");
     t.nonNull.int("categoryId");
     t.int("discountId");
+    t.nonNull.int("subCategoryId");
   },
 });
 
@@ -50,6 +51,7 @@ export const getProductsInput = inputObjectType({
   name: "getProductsInput",
   definition(t) {
     t.int("categoryId");
+    t.int("subCategoryId");
     t.string("name");
     t.int("vendorId");
     t.float("maxSalary");

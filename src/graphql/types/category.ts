@@ -19,6 +19,7 @@ import {
 } from "../inputs";
 import { User } from "./user";
 import { Product } from "./product";
+import { SubCategory } from "./subCategory";
 
 export const Category = objectType({
   name: "Category",
@@ -30,6 +31,7 @@ export const Category = objectType({
     t.int("ownerId");
     t.field("owner", { type: nonNull(User) });
     t.field("product", { type: list(nonNull(Product)) });
+    t.field("SubCategory", { type: list(nonNull(SubCategory)) });
   },
 });
 
@@ -136,6 +138,10 @@ export const categories = extendType({
           where: {
             //@ts-ignore
             name: { contains: args.name },
+          },
+          include: {
+            //@ts-ignore
+            SubCategory: true,
           },
         });
 

@@ -17,12 +17,12 @@ import {
   getProductsInput,
   updateProdcutInput,
   updateProdcutWhereUniqueId,
-  getOneProductInput,
   getProductsOrderBy,
 } from "../inputs";
 import { Category } from "./category";
 import { Inventory } from "./inventory";
 import { Comment } from "./comment";
+import { SubCategory } from "./subCategory";
 
 export const ProductImage = objectType({
   name: "ProductImage",
@@ -52,6 +52,8 @@ export const Product = objectType({
     t.string("createdAt");
     t.string("updatedAt");
     t.field("Comment", { type: list(Comment) });
+    t.int("subCategoryId");
+    t.field("subCategory", { type: SubCategory });
   },
 });
 
@@ -69,9 +71,10 @@ export const createProduct = mutationField("createProduct", {
     }
     console.log("🚀 ~ file: product.ts ~ line 66 ", user);
 
-    //@ts-ignore
+    // @ts-ignore
     if (user.role !== "VENDOR") {
-      throw new Error("sorry not allowed fot this user");
+      console.log("🚀 ~ resolve: ~ user.role:", user.role);
+      throw new Error("sorry not allowed for this user");
     }
 
     const createdProduct = await ctx.prisma.product.create({
@@ -85,10 +88,14 @@ export const createProduct = mutationField("createProduct", {
         createdAt: new Date(),
         updatedAt: new Date(),
         vendorId: user.id,
+        //@ts-ignore
+        subCategoryId: args.input.subCategoryId,
       },
       include: {
         category: true,
         Gallery: true,
+        //@ts-ignore
+        subCategory: true,
       },
     });
     console.log(
@@ -97,12 +104,14 @@ export const createProduct = mutationField("createProduct", {
     );
 
     //@ts-ignore
-    let images = args.input.gallery.map((image) => {
-      return {
-        ...image,
-        productId: createdProduct.id,
-      };
-    });
+    let images = args?.input?.gallery
+      ? args.input.gallery.map((image) => {
+          return {
+            ...image,
+            productId: createdProduct.id,
+          };
+        })
+      : [];
 
     await ctx.prisma.productImage.createMany({
       //@ts-ignore
@@ -116,6 +125,7 @@ export const createProduct = mutationField("createProduct", {
       include: {
         category: true,
         Gallery: true,
+        subCategory: true,
       },
     });
   },
@@ -305,6 +315,19 @@ export const products = extendType({
             };
           }
 
+          let categoryFilter = {};
+
+          if (args?.where?.subCategoryId) {
+            categoryFilter = {
+              subCategoryId: args?.where?.subCategoryId,
+              categoryId: args.where.categoryId,
+            };
+          } else {
+            categoryFilter = {
+              categoryId: args.where.categoryId,
+            };
+          }
+
           filter = {
             skip: args.skip,
             take: args.take,
@@ -312,7 +335,7 @@ export const products = extendType({
               ...priceFilter,
               OR: [
                 //@ts-ignore
-                { categoryId: args.where.categoryId },
+                categoryFilter,
                 //@ts-ignore
                 {
                   name: {
@@ -345,6 +368,7 @@ export const products = extendType({
             },
           },
         });
+        console.log("🚀 ~ resolve: ~ nodes:", nodes);
 
         let getCountFilter = {};
 
@@ -372,6 +396,10 @@ export const products = extendType({
             updatedAt: configureDate(node.updatedAt),
           };
         });
+        console.log(
+          "🚀 ~ letcustomizedNodes:any=nodes.map ~ customizedNodes:",
+          customizedNodes
+        );
         return {
           count,
           nodes: customizedNodes,

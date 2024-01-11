@@ -63,11 +63,16 @@ export interface NexusGenInputs {
     mainImage: string; // String!
     name: string; // String!
     price: number; // Float!
+    subCategoryId: number; // Int!
   }
   createRatingInput: { // input type
     productId: number; // Int!
     ratingValue: number; // Int!
     userId: number; // Int!
+  }
+  createSubCategoryInput: { // input type
+    categoryId: number; // Int!
+    name: string; // String!
   }
   createUserInput: { // input type
     email: string; // String!
@@ -88,6 +93,9 @@ export interface NexusGenInputs {
   getOneCategoryWhereUniqueInput: { // input type
     id: number; // Int!
   }
+  getOneSubCategoryWhereUniqueInput: { // input type
+    id: number; // Int!
+  }
   getOrderInput: { // input type
     id: number; // Int!
   }
@@ -105,11 +113,15 @@ export interface NexusGenInputs {
     maxSalary?: number | null; // Float
     minSalary?: number | null; // Float
     name?: string | null; // String
+    subCategoryId?: number | null; // Int
     vendorId?: number | null; // Int
   }
   getProductsOrderBy: { // input type
     createdAt?: string | null; // String
     price?: string | null; // String
+  }
+  getSubCategoriesWhereUniqueInput: { // input type
+    categoryId: number; // Int!
   }
   getUserAddressesInput: { // input type
     userId: number; // Int!
@@ -204,6 +216,7 @@ export interface NexusGenObjects {
     quantity: number; // Int!
   }
   Category: { // root type
+    SubCategory: NexusGenRootTypes['SubCategory'][]; // [SubCategory!]!
     createdAt: string; // String!
     id: number; // Int!
     name: string; // String!
@@ -271,6 +284,8 @@ export interface NexusGenObjects {
     mainImage: string; // String!
     name: string; // String!
     price: number; // Float!
+    subCategory: NexusGenRootTypes['SubCategory']; // SubCategory!
+    subCategoryId: number; // Int!
     updatedAt: string; // String!
     vendorId: number; // Int!
   }
@@ -288,6 +303,12 @@ export interface NexusGenObjects {
     ratingValue: number; // Int!
     user: NexusGenRootTypes['User']; // User!
     userId: number; // Int!
+  }
+  SubCategory: { // root type
+    category: NexusGenRootTypes['Category']; // Category!
+    categoryId: number; // Int!
+    id: number; // Int!
+    name: string; // String!
   }
   User: { // root type
     Address: NexusGenRootTypes['Address'][]; // [Address!]!
@@ -370,6 +391,7 @@ export interface NexusGenFieldTypes {
     quantity: number; // Int!
   }
   Category: { // field return type
+    SubCategory: NexusGenRootTypes['SubCategory'][]; // [SubCategory!]!
     createdAt: string; // String!
     id: number; // Int!
     name: string; // String!
@@ -421,6 +443,7 @@ export interface NexusGenFieldTypes {
     createOrder: NexusGenRootTypes['Order']; // Order!
     createProduct: NexusGenRootTypes['Product']; // Product!
     createRating: NexusGenRootTypes['Rating']; // Rating!
+    createSubCategory: NexusGenRootTypes['SubCategory']; // SubCategory!
     deleteAddress: NexusGenRootTypes['Address']; // Address!
     deleteCategory: NexusGenRootTypes['Category']; // Category!
     deleteDiscount: NexusGenRootTypes['Discount']; // Discount!
@@ -462,6 +485,8 @@ export interface NexusGenFieldTypes {
     mainImage: string; // String!
     name: string; // String!
     price: number; // Float!
+    subCategory: NexusGenRootTypes['SubCategory']; // SubCategory!
+    subCategoryId: number; // Int!
     updatedAt: string; // String!
     vendorId: number; // Int!
   }
@@ -482,7 +507,9 @@ export interface NexusGenFieldTypes {
     getOneAddress: NexusGenRootTypes['Address']; // Address!
     getOneCategory: NexusGenRootTypes['Category']; // Category!
     getOneOrder: NexusGenRootTypes['Order']; // Order!
+    getOneSubCategory: NexusGenRootTypes['SubCategory']; // SubCategory!
     getOrderItems: NexusGenRootTypes['orderItem'][]; // [orderItem!]!
+    getSubCategories: NexusGenRootTypes['SubCategory'][]; // [SubCategory!]!
     getUserAddresses: NexusGenRootTypes['Address'][]; // [Address!]!
     orders: NexusGenRootTypes['orders']; // orders!
     product: NexusGenRootTypes['Product']; // Product!
@@ -497,6 +524,12 @@ export interface NexusGenFieldTypes {
     ratingValue: number; // Int!
     user: NexusGenRootTypes['User']; // User!
     userId: number; // Int!
+  }
+  SubCategory: { // field return type
+    category: NexusGenRootTypes['Category']; // Category!
+    categoryId: number; // Int!
+    id: number; // Int!
+    name: string; // String!
   }
   User: { // field return type
     Address: NexusGenRootTypes['Address'][]; // [Address!]!
@@ -569,6 +602,7 @@ export interface NexusGenFieldTypeNames {
     quantity: 'Int'
   }
   Category: { // field return type name
+    SubCategory: 'SubCategory'
     createdAt: 'String'
     id: 'Int'
     name: 'String'
@@ -620,6 +654,7 @@ export interface NexusGenFieldTypeNames {
     createOrder: 'Order'
     createProduct: 'Product'
     createRating: 'Rating'
+    createSubCategory: 'SubCategory'
     deleteAddress: 'Address'
     deleteCategory: 'Category'
     deleteDiscount: 'Discount'
@@ -661,6 +696,8 @@ export interface NexusGenFieldTypeNames {
     mainImage: 'String'
     name: 'String'
     price: 'Float'
+    subCategory: 'SubCategory'
+    subCategoryId: 'Int'
     updatedAt: 'String'
     vendorId: 'Int'
   }
@@ -681,7 +718,9 @@ export interface NexusGenFieldTypeNames {
     getOneAddress: 'Address'
     getOneCategory: 'Category'
     getOneOrder: 'Order'
+    getOneSubCategory: 'SubCategory'
     getOrderItems: 'orderItem'
+    getSubCategories: 'SubCategory'
     getUserAddresses: 'Address'
     orders: 'orders'
     product: 'Product'
@@ -696,6 +735,12 @@ export interface NexusGenFieldTypeNames {
     ratingValue: 'Int'
     user: 'User'
     userId: 'Int'
+  }
+  SubCategory: { // field return type name
+    category: 'Category'
+    categoryId: 'Int'
+    id: 'Int'
+    name: 'String'
   }
   User: { // field return type name
     Address: 'Address'
@@ -772,6 +817,9 @@ export interface NexusGenArgTypes {
     }
     createRating: { // args
       input: NexusGenInputs['createRatingInput']; // createRatingInput!
+    }
+    createSubCategory: { // args
+      input: NexusGenInputs['createSubCategoryInput']; // createSubCategoryInput!
     }
     deleteAddress: { // args
       where: NexusGenInputs['getUserWhereUniqueInput']; // getUserWhereUniqueInput!
@@ -851,8 +899,14 @@ export interface NexusGenArgTypes {
     getOneOrder: { // args
       where: NexusGenInputs['getOrderInput']; // getOrderInput!
     }
+    getOneSubCategory: { // args
+      where: NexusGenInputs['getOneSubCategoryWhereUniqueInput']; // getOneSubCategoryWhereUniqueInput!
+    }
     getOrderItems: { // args
       where: NexusGenInputs['getOrderItemsIdInput']; // getOrderItemsIdInput!
+    }
+    getSubCategories: { // args
+      where: NexusGenInputs['getSubCategoriesWhereUniqueInput']; // getSubCategoriesWhereUniqueInput!
     }
     getUserAddresses: { // args
       where: NexusGenInputs['getUserAddressesInput']; // getUserAddressesInput!

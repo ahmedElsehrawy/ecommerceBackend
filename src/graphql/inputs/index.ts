@@ -8,3 +8,4 @@ export * from "./cartInput";
 export * from "./discountInput";
 export * from "./commentInput";
 export * from "./ratingInput";
+export * from "./subCategoryInput";
