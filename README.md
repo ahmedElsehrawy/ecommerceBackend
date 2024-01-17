@@ -4,7 +4,7 @@ This repo is a part of three repositories this is the backend and here are the o
 - [The Client](https://github.com/ahmedElsehrawy/ecommerce-client)
 
 
-## Clone the repo and run the following commands to start the server
+### Clone the repo and run the following commands to start the server
 > yarn
 
 > prisma init
